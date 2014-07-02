@@ -2,276 +2,425 @@
 
 namespace Transpais\Service;
 
+use SebastianBergmann\Exporter\Exception;
 
-class Client {
-    CONST WDSL_URL = 'http://128.10.100.30:8080/VentaWebService/services/VentaService?wsdl';
+/**
+ * Class Client
+ * @package Transpais\Service
+ */
 
-    protected $_soap_client;
+class Client
+{
+    protected $wdsl_url;
+    protected $soap_client;
+    protected $company_id ;
+    protected $pos_id;
+    protected $sale_type_id;
+    protected $client_id;
+    protected $ticket_types = array('sold', 'unsold', 'blocked');
+    protected $tickets;
+    protected $origin_id;
+    protected $destination_id;
+    protected $dateOf;
+    protected $run_id;
+    protected $date_of_run;
+    protected $tickets_to_block;
+    protected $user_id;
+    protected $transaction_num;
+    protected $seat_map;
+    protected $blocked_seats;
+    protected $tickets_to_confirm;
+    protected $runsOfDay;
+    protected $runBasePrice;
 
-    protected $_company_id = -1;
+    /**
+     * Initializing the SoapClient is needed on each call to this class
+     */
+    public function __construct($wdsl_url = null)
+    {
+        if (!is_null($wdsl_url)) {
+            $this->setWdslUrl($wdsl_url);
+        }
 
-    protected $_pos_id = 4825; //Point of Sales id
+        if (!isset($this->wdsl_url)) {
+            throw new Exception('You need to set the WDSL URL');
+        }
 
-    protected $_sale_type_id = 12; // Sale Type id (Internet)
-
-    protected $_client_id = -1;
-
-    protected $_ticket_types = array('sold', 'unsold', 'blocked');
-
-    protected $_tickets;
-
-    protected $_selected_run;
-
-    public function __construct(){
-
-        $this->setSoapClient(self::WDSL_URL);
-
+        $this->setSoapClient($this->wdsl_url);
     }
 
-    public function setSoapClient($url){
+    public function setWdslUrl($url)
+    {
+        $this->wdsl_url = $url;
+    }
 
+    public function setSoapClient($url)
+    {
         $this->_soap_client = new \SoapClient($url);
     }
 
-    public function getRunsInADay($origin_id, $destination_id, $date_of_run){
+    public function setCompanyId($id)
+    {
+        $this->company_id = $id;
+    }
 
-        if(!is_int($origin_id)){ throw new \Exception('Origin ID must be a numeric value.'); }
-        if(!is_int($destination_id)){ throw new \Exception('Destination ID must be a numeric value.'); }
-        //if(!is_int($origin_id)){ throw new \Exception('Origin ID must be a numeric value.'); }
+    public function setPosId($id)
+    {
+        $this->pos_id = $id;
+    }
+
+    public function setSaleTypeId($id)
+    {
+        $this->sale_type_id = $id;
+    }
+
+    public function setClientId($id)
+    {
+        $this->client_id = $id;
+    }
+
+    public function setOriginId($id)
+    {
+        $this->origin_id = $id;
+    }
+    public function setDestinationId($id)
+    {
+        $this->destination_id = $id;
+    }
+
+    public function setDateOfRun($date)
+    {
+        $this->date_of_run = $date;
+    }
+
+    public function setRunId($id)
+    {
+        $this->run_id = $id;
+    }
+
+    public function setTransactionNum($num)
+    {
+        $this->transaction_num = $num;
+    }
+
+    public function getRunsInADay()
+    {
+        if (!isset($this->origin_id) || !is_int($this->origin_id)) {
+            throw new \Exception('Origin ID must be set and a numeric value.');
+        }
+
+        if (!isset($this->destination_id) || !is_int($this->destination_id)) {
+            throw new \Exception('Destination ID must be set and a numeric value.');
+        }
+
+        if (!isset($this->date_of_run) || !static::testIso8601($this->date_of_run)) {
+            throw new \Exception('Date of run should be set and in ISO8601 format Ej. "2004-02-12T15:19:21+00:00".');
+        }
 
         $service_type = 'consultarCorridas';
 
         $service_params = array(
-            'in0' => $origin_id, // origin Place ID (origenId)
-            'in1' => $destination_id, // destination Place ID (destinoId)
-            'in2' => $date_of_run, // date of run ID (destinoId)
+            'in0' => $this->origin_id, // origin Place ID (origenId)
+            'in1' => $this->destination_id, // destination Place ID (destinoId)
+            'in2' => $this->date_of_run,
         );
 
-        $soap_param = array (
+        $soap_param = array(
             'ventaService' => $service_params
         );
-        $soap_response = $this->_callSoapServiceByType($service_type, $soap_param);
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        $response = $this->_normalizeSingleObject($soap_response->out);
+        $response = $this->normalizeSingleObject($soap_response->out);
+
+        $this->setRunsOfDay($response);
 
         return $response;
     }
 
-    public function getSelectedRun(){
+    public static function testIso8601($date_string)
+    {
+        if ($date_string == date('c', strtotime($date_string))) {
+            return true;
+        }
 
-        return $this->_selected_run;
-
+        return false;
     }
 
-    public function setSelectedRun($run){
+    protected function callSoapServiceByType($type, $params)
+    {
 
-        $this->_selected_run = $run;
+        $response = $this->_soap_client->__soapCall($type, $params, array('trace' => 1));
 
+        return $response;
     }
 
-    public function getSeatMap($run_id, $run_date, $origin_id, $destination_id, $sale_type_id = null, $pos_id = null){
+    protected function normalizeSingleObject($out)
+    {
 
-        //if(!is_int($origin_id)){ throw new \Exception('Origin ID must be a numeric value.'); }
-        //if(!is_int($origin_id)){ throw new \Exception('Origin ID must be a numeric value.'); }
-        if(!is_int($origin_id)){ throw new \Exception('Origin ID must be a numeric value.'); }
-        if(!is_int($destination_id)){ throw new \Exception('Destination ID must be a numeric value.'); }
+        foreach ($out as $index => $object) {
 
-        $pos_id = (is_null($pos_id))?$this->_pos_id:$pos_id;
-        $sale_type_id = (is_null($sale_type_id))?$this->_sale_type_id:$sale_type_id;
+            if (!is_array($object)) {
+                $class = new \stdClass();
+                $class->{$index}[] = $object;
+                return $class;
+            } else {
+                return $out;
+            }
+        }
+        return $out;
+    }
+
+    public function setRunsOfDay($runs)
+    {
+        $this->runsOfDay = $runs;
+    }
+
+    public function setRunBasePrice($price)
+    {
+        $this->run_base_price = $price;
+    }
+
+    public function getSeatMap()
+    {
+        if (!isset($this->run_id) || !is_int($this->run_id)) {
+            throw new \Exception('Run Id must be set and a numeric value');
+        }
+        if (!isset($this->date_of_run) || !static::testIso8601($this->date_of_run)) {
+            throw new \Exception('Date of run should be set and in ISO8601 format Ej. "2004-02-12T15:19:21+00:00".');
+        }
+        if (!is_int($this->origin_id) || !is_int($this->origin_id)) {
+            throw new \Exception('Origin ID must be set and a numeric value.');
+        }
+        if (!is_int($this->destination_id) || !is_int($this->destination_id)) {
+            throw new \Exception('Destination ID must be set and a numeric value.');
+        }
+        if (!is_int($this->sale_type_id) || !is_int($this->sale_type_id)) {
+            throw new \Exception('Sale Type ID must be set and a numeric value.');
+        }
+        if (!is_int($this->pos_id) || !is_int($this->pos_id)) {
+            throw new \Exception('POS ID must be set and a numeric value.');
+        }
 
         $service_type = 'consultarAutobus';
 
         $service_params = array(
-            'in0' => $run_id, // run ID (corridaId)
-            'in1' => $run_date, // destination Place ID (fechaCorrida)
-            'in2' => $origin_id, // destination Place ID (origenId)
-            'in3' => $destination_id, // destination Place ID (destinoId)
-            'in4' => $sale_type_id, // destination Place ID (puntoVentId)
-            'in5' => $pos_id, // destination Place ID (puntoVentId)
+            'in0' => $this->run_id, // run ID (corridaId)
+            'in1' => $this->date_of_run,
+            'in2' => $this->origin_id,
+            'in3' => $this->destination_id, // destination Place ID (destinoId)
+            'in4' => $this->pos_id,
+            'in5' => $this->sale_type_id,
         );
 
-        $soap_param = array (
+        $soap_param = array(
             'ventaService' => $service_params
         );
 
-        $soap_response = $this->_callSoapServiceByType($service_type, $soap_param);
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        $response = $this->_normalizeSeatObject($soap_response->out);
+        $response = $this->normalizeSeatObject($soap_response->out);
+
+        $this->setSeatMap($response);
 
         return $response;
     }
 
+    public function setSeatMap($seat_map)
+    {
+        $this->seat_map = $seat_map;
+    }
 
-    /*
-     * @client_id int
-     * @user_id int
-     * @pos_id int
-     * @transaction_num int
-     * @tickets array
-     */
-    public function blockSeat($client_id, $user_id, $pos_id=null, $transaction_num = null, array $tickets = null){
-        if(is_null($tickets)){
-            $tickets = $this->_tickets;
+    protected function normalizeSeatObject($out)
+    {
+        if (!is_array($out->detallesDiagrama->DetalleDiagrama)) {
+            $detail = $out->detallesDiagrama->DetalleDiagrama;
+            $out->detallesDiagrama->DetalleDiagrama = null;
+            $out->detallesDiagrama->DetalleDiagrama = $detail;
+        }
+        if (!is_array($out->disponibilidad->Disponibilidad)) {
+            $disponibilidad = $out->disponibilidad->Disponibilidad;
+            $out->disponibilidad->Disponibilidad = null;
+            $out->disponibilidad->Disponibilidad = $disponibilidad;
+        }
+        return $out;
+    }
+
+    public function setUserId($id)
+    {
+        $this->user_id = $id;
+    }
+
+    public function blockSeat(array $seat)
+    {
+        if (!isset($this->client_id) || !is_int($this->client_id)) {
+            throw new \Exception('Client Id must be set and a numeric value');
+        }
+        if (!isset($this->user_id) || !is_int($this->user_id)) {
+            throw new \Exception('User Id must be set and a numeric value');
+        }
+        if (!isset($this->pos_id) || !is_int($this->pos_id)) {
+            throw new \Exception('POS Id must be set and a numeric value');
+        }
+        if (isset($this->transaction_num) && !is_int($this->transaction_num)) {
+            throw new \Exception('Transaction Number must be a numeric value');
+        }
+        if (!isset($this->run_id) || !is_int($this->run_id)) {
+            throw new \Exception('Run Id must be a numeric value');
+        }
+        $service_type = 'bloquearAsientos';
+
+        $seat_to_block = $this->createSeatToBlock($seat);
+
+        $service_params = array(
+            'in0' => $this->client_id,
+            'in1' => $this->user_id,
+            'in2' => $this->pos_id,
+            'in3' => $this->transaction_num,
+            'in4' => $seat_to_block,
+        );
+
+        $soap_param = array(
+            'ventaService' => $service_params
+        );
+
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+
+        if (is_null($soap_response->out->Boleto->boletoId)) {
+            $error_msg = 'The seat you are tying to block is already taken, please select a '.
+                'different one or unblock this seat first.';
+            throw new \Exception($error_msg);
+        }
+        $response = $this->normalizeSingleObject($soap_response->out);
+
+        $this->addBlockedSeat($response);
+
+        return $response;
+    }
+
+    public function createSeatToBlock(array $seat_param)
+    {
+
+        if (isset($this->run_id) && !is_int($this->run_id)) {
+            throw new \Exception('Run Id must be a numeric value');
+        }
+        if (isset($this->origin_id) && !is_int($this->origin_id)) {
+            throw new \Exception('Origin Id must be a numeric value');
+        }
+        if (isset($this->destination_id) && !is_int($this->destination_id)) {
+            throw new \Exception('Destination Id must be a numeric value');
+        }
+        if (!isset($this->date_of_run) || !static::testIso8601($this->date_of_run)) {
+            throw new \Exception('Date of run should be set and in ISO8601 format Ej. "2004-02-12T15:19:21+00:00".');
         }
 
-        //if(!is_int($origin_id)){ throw new \Exception('Origin ID must be a numeric value.'); }
-        //if(!is_int($origin_id)){ throw new \Exception('Origin ID must be a numeric value.'); }
-        if(!is_int($client_id)){ throw new \Exception('Client ID must be a numeric value.'); }
-        if(!is_int($user_id)){ throw new \Exception('User ID must be a numeric value.'); }
-        if(!is_int($pos_id)){ throw new \Exception('POS ID must be a numeric value.'); }
-        if(!is_int($transaction_num)){ throw new \Exception('Transaction Number must be a numeric value.'); }
+        $seat['Boleto'][] = array(
 
-        $pos_id = (is_null($pos_id))?$this->_pos_id:$pos_id;
+            //'boletoId' => null,
+            'categoriaId' => $seat_param['category_id'],
+            'corridaId' => $this->run_id,
+            'destinoId' => $this->destination_id,
+            'fechaCorrida' => $this->date_of_run,
+            'nombrePasajero' => $seat_param['passenger_name'],
+            'numAsiento' => $seat_param['seat_number'],
+            //$numFolioSistema = ,
+            //$numOperacion = ,
+            'origenId' => $this->origin_id,
+            'precio' => $seat_param['price'],
+            //$precioServicio1 = ,
+            //$precioServicio2 = ,
+            //$precioServicio3 = ,
+            //$precioServicio4 = ,
+            //$servicio1Id = ,
+            //$servicio2Id = ,
+            //$servicio3Id = ,
+            //$servicio4Id = ,
 
-        $service_type = 'bloquearAsientos';
-
-        $service_params = array(
-            'in0' => $client_id, // run ID (corridaId)
-            'in1' => $user_id, // destination Place ID (fechaCorrida)
-            'in2' => $pos_id, // origin Place ID (origenId)
-            'in3' => $transaction_num, // origin Place ID (origenId)
-            'in4' => $tickets, // origin Place ID (origenId)
         );
 
-        $soap_param = array (
-            'ventaService' => $service_params
-        );
-
-        $soap_response = $this->_callSoapServiceByType($service_type, $soap_param);
-
-        $response = $this->_normalizeSingleObject($soap_response->out);
-
-        return $response;
-
+        return $seat;
     }
 
-    public function confirmPayment($client_id, $user_id, $company_id, array $card, array $tickets, $is_return_ticket){
-        /* TODO: validate data */
+    public function addBlockedSeat($seat)
+    {
+        $this->blocked_seats[] = $seat;
+    }
+
+    public function setBlockedSeats($seats)
+    {
+        $this->blocked_seats = $seats;
+    }
+
+    public function setCard(array $card)
+    {
+        $this->card = $card;
+    }
+
+    public function confirmPayment(array $tickets_to_confirm, $is_return_ticket)
+    {
+        if (!isset($this->client_id) || !is_int($this->client_id)) {
+            throw new \Exception('Client Id must be set and a numeric value');
+        }
+        if (!isset($this->user_id) || !is_int($this->user_id)) {
+            throw new \Exception('User Id must be set and a numeric value');
+        }
+        if (!isset($this->company_id) || !is_int($this->company_id)) {
+            throw new \Exception('Company Id must be set and a numeric value');
+        }
+        if (!isset($this->card) || !is_array($this->card)) {
+            throw new \Exception('Card must be set and an array');
+        }
+        if (!is_bool($is_return_ticket)) {
+            throw new \Exception('You have to specify whether the ticket is a return one');
+        }
 
         $service_type = 'bloquearAsientos';
 
         $service_params = array(
-            'in0' => $client_id, // run ID (corridaId)
-            'in1' => $user_id, // user ID (usuarioId)
-            'in2' => $company_id, // company Id (empresaVoucherId - empresaId from corrida) objeto corrida
-            'in3' => $card, // card array (tarjeta)
-            'in4' => $tickets, // tickets array (boletos)
+            'in0' => $this->client_id, // client ID (corridaId)
+            'in1' => $this->user_id, // user ID (usuarioId)
+            'in2' => $this->company_id, // company Id (empresaVoucherId - empresaId from corrida) objeto corrida
+            'in3' => $this->card, // card array (tarjeta)
+            'in4' => $tickets_to_confirm, // tickets array (boletos)
             'in5' => $is_return_ticket, // is a return ticket BOOL (esRedondo)
         );
 
-        $soap_param = array (
+        $soap_param = array(
             'confirmarVentaTarjeta' => $service_params
         );
 
-        $soap_response = $this->_callSoapServiceByType($service_type, $soap_param);
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        $response = $this->_normalizeSingleObject($soap_response->out);
+        $response = $this->normalizeSingleObject($soap_response->out);
 
         return $response;
-
     }
 
-    public function unblockSeat($ticket_id, $user_id){
+    public function unblockSeat($ticket_id)
+    {
 
-        if(!is_int($ticket_id)){ throw new \Exception('Ticket ID must be a numeric value.'); }
-        if(!is_int($user_id)){ throw new \Exception('User ID must be a numeric value.'); }
+        if (!is_int($ticket_id)) {
+            throw new \Exception('Ticket ID must be a numeric value.');
+        }
+        if (!isset($this->user_id) || !is_int($this->user_id)) {
+            throw new \Exception('User ID must be a numeric value.');
+        }
 
         $service_type = 'desbloquearAsientos';
 
         $service_params = array(
             'in0' => $ticket_id, // Ticket ID (boletoId)
-            'in1' => $user_id, // User ID (usuarioId)
+            'in1' => $this->user_id, // User ID (usuarioId)
         );
 
-        $soap_param = array (
+        $soap_param = array(
             'ventaService' => $service_params
         );
-        $soap_response = $this->_callSoapServiceByType($service_type, $soap_param);
 
-        $response = $this->_normalizeSingleObject($soap_response->out);
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        return $response;
-    }
+        $response = $this->normalizeSingleObject($soap_response->out);
 
-    /*
-     * @ticket array(
-     *      boletoId int
-     *      categoriaId int
-     *      corridaId int
-     *      destinoId int
-     *      fechaCorrida datetime ISO8601 ej. 2014-06-17T00:01:01-05:00
-     *      nombrePasajero string
-     *      numAsiento int
-     *      numFolioSistema
-     *      numOperacion int
-     *      origenId int
-     *      precio float(7,2)
-     *      precioServicio1 float(7,2)
-     *      precioServicio2 float(7,2)
-     *      precioServicio3 float(7,2)
-     *      precioServicio4 float(7,2)
-     *      servicio1Id int
-     *      servicio2Id int
-     *      servicio3Id int
-     *      servicio4Id int
-     * )
-     * @type string:
-     */
-    public function addTicket(array $ticket, $type){
-
-        if(!in_array($type, $this->_ticket_types)){ throw new \Exception('Ticket type is not supported');}
-
-        $this->_tickets[$type][] = $ticket;
-
-    }
-
-    /*
-     * @card array(
-     *      aid
-     *      arqc
-     *      autorizacion
-     *      banco
-     *      complemento
-     *      correo
-     *      direccion
-     *      empresa
-     *      fechaOperacion
-     *      importe
-     *      nombre
-     *      numOperacion
-     *      numTarjeta
-     *      referencia
-     *      status
-     *      sucursal
-     *      tipoOperacion
-     *      tipoTarjeta
-     *      usuarioBancario
-     *      vigencia
-     * )
-     */
-    public function setCard($card){
-        $this->_card = $card;
-    }
-
-    public function getCard(){
-        return $this->_card;
-    }
-
-    public function setTickets(array $tickets, $type){
-        if(!in_array($type, $this->_ticket_types)){ throw new \Exception('Ticket type is not supported');}
-
-        $this->_tickets[$type] = $tickets;
-    }
-
-    public function getTickets(array $tickets, $type){
-        if(!in_array($type, $this->_ticket_types)){ throw new \Exception('Ticket type is not supported');}
-
-        return $this->_tickets[$type];
-    }
-
-    protected  function _callSoapServiceByType($type, $params){
-
-        $response = $this->_soap_client->__soapCall($type, $params, array('trace' => 1));
+        $this->unsetBlockedSeat($ticket_id);
 
         return $response;
     }
@@ -283,38 +432,42 @@ class Client {
      * when receiving two places.
      *
      */
-    protected  function _normalizeSingleObject( $out){
-        foreach($out as $object){
-            if(!is_array($object)){
-                $parada = $object;
-                $object = null;
-                $object{0} = $parada;
+
+    public function unsetBlockedSeat($seat_id)
+    {
+
+        foreach ($this->blocked_seats as $index => $seat) {
+            if ($seat->Boleto{0}->boletoId == $seat_id) {
+                unset($this->blocked_seats[$index]);
             }
         }
 
-        return $out;
+        return $seat_id;
     }
 
-    protected function _normalizeSeatObject($out){
-        if(!is_array($out->detallesDiagrama->DetalleDiagrama)){
-            $detail = $out->detallesDiagrama->DetalleDiagrama;
-            $out->detallesDiagrama->DetalleDiagrama = null;
-            $out->detallesDiagrama->DetalleDiagrama = $detail;
+    /**
+     * @param array $ticket
+     * @param $type
+     * @throws \Exception
+     */
+    public function addTicket(array $ticket, $type)
+    {
+
+        if (!in_array($type, $this->ticket_types)) {
+            throw new \Exception('Ticket type is not supported');
         }
-        if(!is_array($out->disponibilidad->Disponibilidad)){
-            $disponibilidad = $out->disponibilidad->Disponibilidad;
-            $out->disponibilidad->Disponibilidad = null;
-            $out->disponibilidad->Disponibilidad = $disponibilidad;
-        }
-        return $out;
+
+        $this->tickets[$type][] = $ticket;
+
     }
 
-    protected function _placeArrayToEnglish($array){
-        if(!is_array($array)){
+    protected function placeArrayToEnglish($array)
+    {
+        if (!is_array($array)) {
             throw new \Exception('An array is expected');
         }
 
-        foreach($array as $row){
+        foreach ($array as $row) {
             $object = new \stdClass();
 
             $object->key = $row->cve;
@@ -326,6 +479,4 @@ class Client {
 
         return $outputArr;
     }
-
-
 }
