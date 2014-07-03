@@ -6,7 +6,7 @@
  * Time: 10:04 AM
  */
 
-namespace Transpais\Service;
+namespace Transpais\Type;
 
 
 class RequestRuns
@@ -42,11 +42,8 @@ class RequestRuns
         return $this->destination_id;
     }
 
-    public function setDateOfRun($date)
+    public function setDateOfRun(\DateTime $date)
     {
-        if (!static::testIso8601($date)) {
-            throw new \Exception('Date of run should be set and in ISO8601 format Ej. "2004-02-12T15:19:21+00:00".');
-        }
         $this->date_of_run = $date;
     }
 
@@ -55,18 +52,8 @@ class RequestRuns
         return $this->date_of_run;
     }
 
-    protected static function testIso8601($date_string)
-    {
-        if ($date_string == date('c', strtotime($date_string))) {
-            return true;
-        }
-
-        return false;
-    }
-
     protected function callSoapServiceByType($type, $params)
     {
-
         $response = $this->_soap_client->__soapCall($type, $params, array('trace' => 1));
 
         return $response;

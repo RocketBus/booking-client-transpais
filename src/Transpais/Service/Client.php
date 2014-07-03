@@ -8,7 +8,9 @@
 
 namespace Transpais\Service;
 
-use Transpais\Service\RequestRuns;
+use Transpais\Type\RequestRuns;
+use Transpais\Type\ResponseRuns;
+use Transpais\Type\Run;
 
 class Client
 {
@@ -38,7 +40,7 @@ class Client
         $service_params = array(
             'in0' => $requestRuns->getOriginId(), // origin Place ID (origenId)
             'in1' => $requestRuns->getDestinationId(), // destination Place ID (destinoId)
-            'in2' => $requestRuns->getDateOfRun(),
+            'in2' => $requestRuns->getDateOfRun()->format('c'),
         );
 
         $soap_param = array(
@@ -46,9 +48,7 @@ class Client
         );
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        $response = $this->normalizeSingleObject($soap_response->out);
-
-        $this->setRequestRuns($requestRuns);
+        $response = $this->normalizeResponseToRun($soap_response->out->Corrida);
 
         return $response;
     }
@@ -87,8 +87,16 @@ class Client
         $this->_soap_client = new \SoapClient($url);
     }
 
-    protected function setRequestRuns(RequestRuns $requestRuns)
+    protected function normalizeResponseToRun($response)
     {
-        $this->request_runs = $requestRuns;
+        $responseRuns = new ResponseRuns();
+
+        foreach ($response as $run) {
+            $runObj = new Run($run);
+            $responseRuns->append($runObj);
+        }
+
+        return $responseRuns;
     }
+
 }
