@@ -8,6 +8,8 @@
 
 namespace Transpais\Type;
 
+use Transpais\Type\Errors\RequestException;
+
 
 class RequestRuns
 {
@@ -19,7 +21,7 @@ class RequestRuns
     public function setOriginId($id)
     {
         if (!is_int($id)) {
-            throw new \Exception('Origin ID must be set and a numeric value.');
+            throw new RequestException('Origin ID must be set and a numeric value.');
         }
         $this->origin_id = $id;
     }
@@ -32,7 +34,7 @@ class RequestRuns
     public function setDestinationId($id)
     {
         if (!is_int($id)) {
-            throw new \Exception('Destination ID must be set and a numeric value.');
+            throw new RequestException('Destination ID must be set and a numeric value.');
         }
         $this->destination_id = $id;
     }
@@ -50,12 +52,5 @@ class RequestRuns
     public function getDateOfRun()
     {
         return $this->date_of_run;
-    }
-
-    protected function callSoapServiceByType($type, $params)
-    {
-        $response = $this->_soap_client->__soapCall($type, $params, array('trace' => 1));
-
-        return $response;
     }
 }
