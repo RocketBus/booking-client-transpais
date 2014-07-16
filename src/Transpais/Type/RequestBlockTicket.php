@@ -12,24 +12,24 @@ class RequestBlockTicket
 {
     protected $client_id; //clienteId
     protected $user_id; //usuarioId
-    protected $RequestSeatMap;
+    protected $pos_id;
     protected $transaction_num; //numOperacion
     protected $ticket;
 
     /**
-     * @param mixed $RequestSeatMap
+     * @param mixed $pos_id
      */
-    public function setRequestSeatMap(RequestSeatMap $RequestSeatMap)
+    public function setPosId($pos_id)
     {
-        $this->RequestSeatMap = $RequestSeatMap;
+        $this->pos_id = $pos_id;
     }
 
     /**
      * @return mixed
      */
-    public function getRequestSeatMap()
+    public function getPosId()
     {
-        return $this->RequestSeatMap;
+        return $this->pos_id;
     }
 
     /**

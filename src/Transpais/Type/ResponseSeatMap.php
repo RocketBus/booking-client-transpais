@@ -8,15 +8,14 @@
 
 namespace Transpais\Type;
 
-use Transpais\Type\Seat;
-use Transpais\Type\Errors;
+use Transpais\Type\Errors\TypeException;
 
 class ResponseSeatMap extends \ArrayObject
 {
     public function append($seat)
     {
         if (!$seat instanceof Seat ) {
-            throw new \TypeException("An instance of Seat is required");
+            throw new TypeException("An instance of Seat is required");
         }
 
         parent::append($seat);

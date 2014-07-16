@@ -8,14 +8,17 @@
 
 namespace Transpais\Service;
 
+use Transpais\Type\Errors\SoapException;
 use Transpais\Type\RequestBlockTicket;
+use Transpais\Type\RequestConfirmPayment;
 use Transpais\Type\RequestRuns;
 use Transpais\Type\RequestSeatMap;
 use Transpais\Type\ResponseSeatMap;
 use Transpais\Type\ResponseRuns;
-use Transpais\Type\Run;
-use Transpais\Type\Seat;
-use Transpais\Type\Ticket;
+use Transpais\Type\TicketToBlockFactory;
+use Transpais\Type\RunFactory;
+use Transpais\Type\Errors\RequestException;
+use Transpais\Type\SeatFactory;
 
 class Client
 {
@@ -33,18 +36,20 @@ class Client
     {
         $service_type = 'consultarCorridas';
 
+        $formattedDateOfRun = $requestRuns->getDateOfRun()->format('c');
         $service_params = array(
             'in0' => $requestRuns->getOriginId(), // origin Place ID (origenId)
             'in1' => $requestRuns->getDestinationId(), // destination Place ID (destinoId)
-            'in2' => $requestRuns->getDateOfRun()->format('c'),
+            'in2' => $formattedDateOfRun,
         );
 
         $soap_param = array(
             'ventaService' => $service_params
         );
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
-        
-        $response = $this->normalizeResponseToRun($soap_response->out->Corrida);
+
+        $corrida = $soap_response->out->Corrida;
+        $response = $this->normalizeResponseToRun($corrida);
 
         return $response;
     }
@@ -53,14 +58,12 @@ class Client
     {
         $service_type = 'consultarAutobus';
 
-        $requestRuns = $requestSeatMap->getRequestRuns();
-        $formattedDateOfRun = $requestRuns->getDateOfRun()->format('c');
-
+        $formattedDateOfRun = $requestSeatMap->getDateOfRun()->format('c');
         $service_params = array(
             'in0' => $requestSeatMap->getRunId(), // run ID (corridaId)
             'in1' => $formattedDateOfRun,
-            'in2' => $requestRuns->getOriginId(),
-            'in3' => $requestRuns->getDestinationId(), // destination Place ID (destinoId)
+            'in2' => $requestSeatMap->getOriginId(),
+            'in3' => $requestSeatMap->getDestinationId(), // destination Place ID (destinoId)
             'in4' => $requestSeatMap->getPosId(),
             'in5' => $requestSeatMap->getSaleTypeId(),
         );
@@ -76,16 +79,16 @@ class Client
         return $response;
     }
 
-    public function blockSeat(RequestBlockTicket $RequestBlockTicket)
+    public function blockTicket(RequestBlockTicket $RequestBlockTicket)
     {
         $service_type = 'bloquearAsientos';
-        $tickets_to_block['Boleto'] = $this->createTicketToBlock($RequestBlockTicket->getTicket());
-        $seatMap = $RequestBlockTicket->getRequestSeatMap();
+
+        $tickets_to_block['Boleto'] = TicketToBlockFactory::create($RequestBlockTicket->getTicket());
 
         $service_params = array(
             'in0' => $RequestBlockTicket->getClientId(),
             'in1' => $RequestBlockTicket->getUserId(),
-            'in2' => $seatMap->getPosId(),
+            'in2' => $RequestBlockTicket->getPosId(),
             'in3' => $RequestBlockTicket->getTransactionNum(),
             'in4' => $tickets_to_block,
         );
@@ -99,15 +102,63 @@ class Client
         if (is_null($soap_response->out->Boleto->boletoId)) {
             $error_msg = 'The seat you are tying to block is already taken, please select a '.
                 'different one or unblock this seat first.';
-            throw new \RequestException($error_msg);
+            throw new RequestException($error_msg);
         }
 
         $Boleto = $soap_response->out->Boleto;
-        $Ticket = $RequestBlockTicket->getTicket();
-        $Ticket->setTicketId($Boleto->boletoId);
-        $Ticket->setPrice($Boleto->precio);
+        $ticket = $RequestBlockTicket->getTicket();
+        $ticket->setTicketId($Boleto->boletoId);
+        $ticket->setPrice($Boleto->precio);
 
-        return $Ticket;
+        return $ticket;
+    }
+
+    public function unblockTicket($ticket_id, $user_id)
+    {
+
+        $service_type = 'desbloquearAsientos';
+
+        $service_params = array(
+            'in0' => $ticket_id, // Ticket ID (boletoId)
+            'in1' => $user_id, // User ID (usuarioId)
+        );
+
+        $soap_param = array(
+            'ventaService' => $service_params
+        );
+
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+
+        $status = $soap_response->out->status;
+        if ($status !== 'Eliminado') {
+            throw new SoapException('The ticket was either not deleted or was not previously blocked');
+        }
+
+        return true;
+    }
+
+    public function confirmPayment(RequestConfirmPayment $requestConfirmPayment)
+    {
+        $service_type = 'bloquearAsientos';
+
+        $service_params = array(
+            'in0' => $requestConfirmPayment->getClientId(), // client ID (corridaId)
+            'in1' => $requestConfirmPayment->getUserId(), // user ID (usuarioId)
+            'in2' => $requestConfirmPayment->getCompanyId(), // company Id (empresaVoucherId - empresaId from corrida) objeto corrida
+            'in3' => $requestConfirmPayment->getCard(), // card array (tarjeta)
+            'in4' => $requestConfirmPayment->getTicketsToConfirm(), // tickets array (boletos)
+            'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
+        );
+
+        $soap_param = array(
+            'confirmarVentaTarjeta' => $service_params
+        );
+
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+
+        $response = $this->normalizeSingleObject($soap_response->out->Boleto);
+
+        return $response;
     }
 
     protected function callSoapServiceByType($type, $params)
@@ -116,22 +167,6 @@ class Client
         $response = $this->_soap_client->__soapCall($type, $params, array('trace' => 1));
 
         return $response;
-    }
-
-    protected function normalizeSingleObject($out)
-    {
-
-        foreach ($out as $index => $object) {
-
-            if (!is_array($object)) {
-                $class = new \stdClass();
-                $class->{$index}[] = $object;
-                return $class;
-            } else {
-                return $out;
-            }
-        }
-        return $out;
     }
 
     public function setSoapClient($soapClient)
@@ -143,8 +178,13 @@ class Client
     {
         $responseRuns = new ResponseRuns();
 
-        foreach ($response as $run) {
-            $runObj = new Run($run);
+        if (is_array($response)) {
+            foreach ($response as $run) {
+                $runObj = RunFactory::create($run);
+                $responseRuns->append($runObj);
+            }
+        } else {
+            $runObj = RunFactory::create($response);
             $responseRuns->append($runObj);
         }
 
@@ -155,27 +195,17 @@ class Client
     {
         $responseSeatMap = new ResponseSeatMap();
 
-        foreach ($response->detallesDiagrama->DetalleDiagrama as $seat) {
-            $seatObj = new Seat($seat);
+        $detalleDiagrama = $response->detallesDiagrama->DetalleDiagrama;
+        if (is_array($detalleDiagrama)) {
+            foreach ($detalleDiagrama as $seat) {
+                $seatObj = SeatFactory::create($seat);
+                $responseSeatMap->append($seatObj);
+            }
+        } else {
+            $seatObj = SeatFactory::create($response);
             $responseSeatMap->append($seatObj);
         }
 
         return $responseSeatMap;
-    }
-
-    public function createTicketToBlock(Ticket $Ticket)
-    {
-        $ticket_to_block = array(
-            'categoriaId' => $Ticket->getCategoryId(),
-            'corridaId' => $Ticket->getRun()->getCorridaId(),
-            'destinoId' => $Ticket->getRequestRuns()->getDestinationId(),
-            'fechaCorrida' => $Ticket->getRequestRuns()->getDateOfRun()->format('c'),
-            'nombrePasajero' => $Ticket->getPassengerName(),
-            'numAsiento' => $Ticket->getSeat()->getAsiento(),
-            'origenId' => $Ticket->getRequestRuns()->getOriginId(),
-            'precio' => $Ticket->getRun()->getPrecioBase(),
-        );
-
-        return $ticket_to_block;
     }
 }

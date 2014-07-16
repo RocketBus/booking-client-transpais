@@ -13,12 +13,15 @@ class Ticket
 {
     protected $ticket_id;
     protected $category_id; //catergory_id
-    protected $RequestRuns;
+    protected $run_id;
+    protected $origin_id;
+    protected $destination_id;
+    protected $date_of_run;
     protected $passenger_name; //nombrePasajero
-    protected $Seat;
-    protected $Run;
+    protected $seat_number;
     protected $folio_number; //numFolioSistema
     protected $transaction_num; //numOperacion
+    protected $base_price;
     protected $price;
     protected $price_service1; //precioServicio1
     protected $price_service2; //precioServicio2
@@ -28,6 +31,102 @@ class Ticket
     protected $service2_id; //servicio2Id
     protected $service3_id; //servicio3Id
     protected $service4_id;
+
+    /**
+     * @param mixed $base_price
+     */
+    public function setBasePrice($base_price)
+    {
+        $this->base_price = $base_price;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBasePrice()
+    {
+        return $this->base_price;
+    }
+
+    /**
+     * @param mixed $seat_number
+     */
+    public function setSeatNumber($seat_number)
+    {
+        $this->seat_number = $seat_number;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSeatNumber()
+    {
+        return $this->seat_number;
+    }
+
+    /**
+     * @param mixed $date_of_run
+     */
+    public function setDateOfRun($date_of_run)
+    {
+        $this->date_of_run = $date_of_run;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateOfRun()
+    {
+        return $this->date_of_run;
+    }
+
+    /**
+     * @param mixed $destination_id
+     */
+    public function setDestinationId($destination_id)
+    {
+        $this->destination_id = $destination_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDestinationId()
+    {
+        return $this->destination_id;
+    }
+
+    /**
+     * @param mixed $origin_id
+     */
+    public function setOriginId($origin_id)
+    {
+        $this->origin_id = $origin_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOriginId()
+    {
+        return $this->origin_id;
+    }
+
+    /**
+     * @param mixed $run_id
+     */
+    public function setRunId($run_id)
+    {
+        $this->run_id = $run_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRunId()
+    {
+        return $this->run_id;
+    }
 
     /**
      * @param mixed $price
@@ -59,54 +158,6 @@ class Ticket
     public function getTicketId()
     {
         return $this->ticket_id;
-    }
-
-    /**
-     * @param mixed $RequestRuns
-     */
-    public function setRequestRuns(RequestRuns $RequestRuns)
-    {
-        $this->RequestRuns = $RequestRuns;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRequestRuns()
-    {
-        return $this->RequestRuns;
-    }
-
-    /**
-     * @param mixed $Seat
-     */
-    public function setSeat(Seat $Seat)
-    {
-        $this->Seat = $Seat;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSeat()
-    {
-        return $this->Seat;
-    }
-
-    /**
-     * @param mixed $Run
-     */
-    public function setRun(Run $Run)
-    {
-        $this->Run = $Run;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRun()
-    {
-        return $this->Run;
     }
 
     /**

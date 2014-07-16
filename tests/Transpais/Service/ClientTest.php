@@ -9,19 +9,22 @@
 namespace Transpais\Service;
 
 use Transpais\Type\RequestRuns;
+use Transpais\Type\RequestSeatMap;
+use Transpais\Type\RequestBlockTicket;
+use Transpais\Type\Ticket;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
     protected $fakeSoapClient;
+    protected $client;
 
     public function test_if_instance_is_ok()
     {
-        $client = new Client($this->fakeSoapClient);
-        $this->assertInstanceOf('Transpais\Service\Client', $client);
+        $this->assertInstanceOf('Transpais\Service\Client', $this->client);
     }
 
 
-    public function test_if_normalize_response_to_run_returns_a_valid_run_object()
+    public function test_if_normalize_response_to_run_returns_a_valid_runs_object()
     {
         $dummyresponse = new \stdClass();
         $dummyresponse->out->Corrida[] = (object) array(
@@ -53,108 +56,93 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $tomorrow = new \DateTime('tomorrow');
         $requestRuns->setDateOfRun($tomorrow);
 
-        $client = new Client($this->fakeSoapClient);
-        $runs = $client->getRunsInADay($requestRuns);
+        $runs = $this->client->getRunsInADay($requestRuns);
 
+        $this->assertGreaterThan(0, count($runs));
+        $this->assertInstanceOf('Transpais\Type\Run', $runs[0]);
+        $this->assertInstanceOf('\DateTime', $runs[0]->getDateOfRun());
+        $this->assertInstanceOf('\DateTime', $runs[0]->getDateOfArrival());
+        $this->assertInstanceOf('\DateTime', $runs[0]->getDateOfDeparture());
 
+    }
+
+    public function test_if_normalize_response_seat_map_returns_a_valid_response_seat_map_object()
+    {
+        $dummySoapResponse = new \stdClass();
+        $dummySoapResponse->out->detallesDiagrama->DetalleDiagrama[0] = (object) array(
+            'asiento' => 'P009',
+            'coluna' => null,
+            'fila' => null,
+            'status' => 'DP'
+        );
+
+        $this->fakeSoapClient->setResponse($dummySoapResponse);
+
+        $requestSeatMap = new RequestSeatMap();
+        $requestSeatMap->setOriginId(1886);
+        $requestSeatMap->setDestinationId(2219);
+        $tomorrow = new \DateTime('tomorrow');
+        $requestSeatMap->setDateOfRun($tomorrow);
+        $requestSeatMap->setPosId(4825);
+        $requestSeatMap->setRunId(37842);//Dynamic number, this is a mock number
+        $requestSeatMap->setSaleTypeId(12);
+
+        $responseSeatMap = $this->client->getSeatMap($requestSeatMap);
+
+        $this->assertInstanceOf('Transpais\Type\ResponseSeatMap', $responseSeatMap);
+        $this->assertInstanceOf('Transpais\Type\Seat', $responseSeatMap[0]);
+    }
+
+    public function test_if_ticket_id_is_assigned_to_the_ticket_object_in_block_ticket()
+    {
+        $dummySoapResponse = (object) array(
+            'out' => (object) array(
+                'Boleto' => (object) array(
+                    'boletoId' => '10000002910666',
+                    'categoriaId' => 1,
+                    'corridaId' => 37842,
+                    'destinoId' => 2219,
+                    'fechaCorrida' => '2014-07-15T17:00:00-05:00',
+                    'nombrePasajero' => 'Jonh Secada',
+                    'numAsiento' => 'P007',
+                    'numOperacion' => '-1',
+                    'origenId' => 1886,
+                    'precio' => '315'
+                )
+            )
+        );
+
+        $this->fakeSoapClient->setResponse($dummySoapResponse);
+
+        $requestBlockTicket = new RequestBlockTicket();
+        $requestBlockTicket->setUserId(619);
+        $requestBlockTicket->setClientId(-1);
+        $requestBlockTicket->setPosId(4825);
+        $requestBlockTicket->setTransactionNum(-1);
+
+        $ticket_to_block = new Ticket();
+        $ticket_to_block->setCategoryId(1);// full price
+        $ticket_to_block->setRunId(37842);//Dynamic number, this is a mock number
+        $ticket_to_block->setOriginId(1886);
+        $ticket_to_block->setDestinationId(2219);
+        $tomorrow = new \DateTime('tomorrow');
+        $ticket_to_block->setDateOfRun($tomorrow);
+        $ticket_to_block->setPassengerName('Jonh Secada');
+        $ticket_to_block->setPrice(212);
+
+        $requestBlockTicket->appendTicket($ticket_to_block);
+
+        $ticket_blocked = $this->client->blockTicket($requestBlockTicket);
+
+        $this->assertInstanceOf('Transpais\Type\Ticket', $ticket_blocked);
+        $this->assertTrue(!is_null($ticket_blocked->getTicketId()));
     }
 
     protected function setUp()
     {
         $this->fakeSoapClient = new \MockSoapClient('fake://wdsl');
+        $this->client = new Client($this->fakeSoapClient);
     }
 
-//    protected $_origen_id = 1886;
-//    protected $_destination_id = 2219;
-//    protected $_sale_type_id = 4825;
-//    protected $_pos_id = 12;
-//    protected $_client_id = -1;
-//    protected $_user_id = 619;
-//    protected $_tomorrow;
-//    protected $_in_two_days;
-//
-//    public function __construct(){
-//
-//        $this->_tomorrow = date('c', strtotime(date('c') . ' + 1 day'));
-//        $this->_in_two_days = date('c', strtotime(date('c') . ' + 2 day'));
-//    }
-//    public function testConnectionToWs(){
-//        $client = new Client('http://128.10.100.30:8080/VentaWebService/services/VentaService?wsdl');
-//
-//    }
-//    public function testFunctionalTest(){
-//
-//        $client = new Client('http://128.10.100.30:8080/VentaWebService/services/VentaService?wsdl');
-//
-//        // set params needed to get all the runs in a Day for a given route
-//        $client->setOriginId(1886);
-//        $client->setDestinationId(2219);
-//        $tomorrow = new \DateTime('tomorrow');
-//        $client->setDateOfRun(date('c', strtotime( $tomorrow->format('Y-m-d H:i:s') . ' + 1 day')));
-//
-//        $runs = $client->getRunsInADay();
-//
-//        $this->assertObjectHasAttribute('Corrida', $runs);
-//        $this->assertArrayHasKey(0, $runs->Corrida);
-//
-//        $aRun = $runs->Corrida{0}->corridaId;
-//        $client->setRunId($aRun);
-//        $client->setSaleTypeId(12);
-//        $client->setPosId(4825);
-//
-//        $seats = $client->getSeatMap();
-//
-//        $this->assertObjectHasAttribute('detallesDiagrama', $seats, 'Run\'s object is not contructed as expected');
-//        $this->assertObjectHasAttribute('DetalleDiagrama', $seats->detallesDiagrama, 'Run\'s object is not contructed as expected');
-//        $this->assertObjectHasAttribute('disponibilidad', $seats, 'Run\'s object is not contructed as expected');
-//        $this->assertGreaterThan(0, count($seats->detallesDiagrama->DetalleDiagrama), 'It does not return any row');
-//        $this->assertArrayHasKey(0, $seats->detallesDiagrama->DetalleDiagrama, 'It does not return run\'s details');
-//        $this->assertGreaterThan(2, $seats->disponibilidad->Disponibilidad->cantidad, 'There are no available seats in this run, or to continue with this test');
-//
-//        // get 3 seats available
-//        $client->setUserId(619);
-//        $client->setClientId(-1);
-//        $client->setTransactionNum(-1);
-//        $tickets_blocked = array();
-//        foreach ($seats->detallesDiagrama->DetalleDiagrama as $seat) {
-//            if (is_int($seat->asiento*1)) {
-//                $seat_to_block = array(
-//                    'category_id' => 1,
-//                    'seat_number' => $seat->asiento,
-//                    'passenger_name' => 'Jonh Secada',
-//                    'price' => floatval($runs->Corrida{0}->precioBase)
-//                );
-//
-//                $tickets_blocked[] = $client->blockSeat($seat_to_block);
-//            }
-//            if (count($tickets_blocked) >=3) {
-//                break;
-//            }
-//        }
-//
-//        if (count($tickets_blocked) <3){
-//            throw new Exception('There are no enough available seats to further perform this test.');
-//        }
-//
-//        // Test unblocking a seat
-//
-//        $result = $client->unblockSeat($tickets_blocked[2]->Boleto{0}->boletoId);
-//
-//        $this->assertEquals('Eliminado', $result->status{0}, 'The ticket was not unblocked');
-//
-//        /*var_dump($result);
-//        echo '-----------------------------------'."\n";
-//
-//
-//        $tickets_to_confirm['Boleto'][] = (array) $ticket_blocked->Boleto;
-//        $tickets_to_confirm['Boleto'][] = (array) $ticket_blocked2->Boleto;
-//
-//        $card = array(
-//            'autorizacion' => '1234',
-//        );
-//        $client->setCard($card);
-//        $payment = $client->confirmPayment($tickets_to_confirm, false);
-//        var_dump($payment);*/
-//    }
 
 } 

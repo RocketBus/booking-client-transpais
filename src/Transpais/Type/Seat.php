@@ -11,53 +11,73 @@ namespace Transpais\Type;
 
 class Seat
 {
-    protected $asiento;
-    protected $coluna;
-    protected $fila;
+    protected $seatNumber;
+    protected $column;
+    protected $row;
     protected $status;
 
-    public function __construct($seat)
-    {
-        // set minimum configuration
-        $this->setAsiento($seat->asiento);
-        $this->setColuna($seat->coluna);
-        $this->setFila($seat->fila);
-        $this->setStatus($seat->status);
-    }
-
-    // setters
-    public function setAsiento($asiento)
-    {
-        $this->asiento = $asiento;
-    }
-    public function setColuna($coluna)
-    {
-        $this->coluna = $coluna;
-    }
-    public function setFila($fila)
-    {
-        $this->fila = $fila;
-    }
+    /**
+     * @param mixed $status
+     */
     public function setStatus($status)
     {
         $this->status = $status;
     }
 
-    // getters
-    public function getAsiento()
-    {
-        return $this->asiento;
-    }
-    public function getColuna()
-    {
-        return $this->coluna;
-    }
-    public function getFila()
-    {
-        return $this->fila;
-    }
+    /**
+     * @return mixed
+     */
     public function getStatus()
     {
         return $this->status;
     }
+
+    /**
+     * @param mixed $column
+     */
+    public function setColumn($column)
+    {
+        $this->column = $column;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getColumn()
+    {
+        return $this->column;
+    }
+
+    /**
+     * @param mixed $row
+     */
+    public function setRow($row)
+    {
+        $this->row = $row;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRow()
+    {
+        return $this->row;
+    }
+
+    /**
+     * @param mixed $seatNumber
+     */
+    public function setSeatNumber($seatNumber)
+    {
+        $this->seatNumber = $seatNumber;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSeatNumber()
+    {
+        return $this->seatNumber;
+    }
+
 }

@@ -11,182 +11,295 @@ namespace Transpais\Type;
 
 class Run
 {
-    protected $asientosDisp;
-    protected $claseServicioId;
-    protected $corrida2Id;
-    protected $corridaId;
-    protected $cveDestino;
-    protected $descripcionClaseServicio;
-    protected $descripcionEmpresa;
-    protected $empresaId;
-    protected $fechaCorrida;
-    protected $fechorLlegada;
-    protected $fechorSalida;
-    protected $nombreMarca;
-    protected $numKms;
-    protected $numPiso;
-    protected $precioBase;
-    protected $tiempoRecorrido;
-    protected $tipoServicio;
+    protected $idleSeatsNum;
+    protected $serviceClassId;
+    protected $run2Id;
+    protected $runId;
+    protected $destinationCode;
+    protected $serviceClassDescription;
+    protected $companyDescription;
+    protected $companyId;
+    protected $dateOfRun;
+    protected $dateOfArrival;
+    protected $dateOfDeparture;
+    protected $brandName;
+    protected $kms;
+    protected $floorNumber;
+    protected $basePrice;
+    protected $runDuration;
+    protected $serviceType;
 
-    public function __construct($corrida)
+    /**
+     * @param mixed $basePrice
+     */
+    public function setBasePrice($basePrice)
     {
-        $this->setAsientosDisp($corrida->asientosDisp);
-        $this->setClaseServicioId($corrida->claseServicioId);
-        $this->setCorrida2Id($corrida->corrida2Id);
-        $this->setCorridaId($corrida->corridaId);
-        $this->setCveDestino($corrida->cveDestino);
-        $this->setDescripcionClaseServicio($corrida->descripcionClaseServicio);
-        $this->setDescripcionEmpresa($corrida->descripcionEmpresa);
-        $this->setEmpresaId($corrida->empresaId);
-        $this->setFechaCorrida($corrida->fechaCorrida);
-        $this->setFechorLlegada($corrida->fechorLlegada);
-        $this->setFechorSalida($corrida->fechorSalida);
-        $this->setNombreMarca($corrida->nombreMarca);
-        $this->setNumKms($corrida->numKms);
-        $this->setNumPiso($corrida->numPiso);
-        $this->setPrecioBase($corrida->precioBase);
-        $this->setTiempoRecorrido($corrida->tiempoRecorrido);
-        $this->setTipoServicio($corrida->tipoServicio);
+        $this->basePrice = $basePrice;
     }
 
-    // setters
-    public function setAsientosDisp($asientosDisp)
+    /**
+     * @return mixed
+     */
+    public function getBasePrice()
     {
-        $this->asientosDisp = $asientosDisp;
-    }
-    public function setClaseServicioId($claseServicioId)
-    {
-        $this->claseServicioId = $claseServicioId;
-    }
-    public function setCorrida2Id($corrida2Id)
-    {
-        $this->corrida2Id = $corrida2Id;
-    }
-    public function setCorridaId($corridaId)
-    {
-        $this->corridaId = $corridaId;
-    }
-    public function setCveDestino($cveDestino)
-    {
-        $this->cveDestino = $cveDestino;
-    }
-    public function setDescripcionClaseServicio($descripcionClaseServicio)
-    {
-        $this->descripcionClaseServicio = $descripcionClaseServicio;
-    }
-    public function setDescripcionEmpresa($descripcionEmpresa)
-    {
-        $this->descripcionEmpresa = $descripcionEmpresa;
-    }
-    public function setEmpresaId($empresaId)
-    {
-        $this->empresaId = $empresaId;
-    }
-    public function setFechaCorrida($fechaCorrida)
-    {
-        $this->fechaCorrida = $fechaCorrida;
-    }
-    public function setFechorLlegada($fechorLlegada)
-    {
-        $this->fechorLlegada = $fechorLlegada;
-    }
-    public function setFechorSalida($fechorSalida)
-    {
-        $this->fechorSalida = $fechorSalida;
-    }
-    public function setNombreMarca($nombreMarca)
-    {
-        $this->nombreMarca = $nombreMarca;
-    }
-    public function setNumKms($numKms)
-    {
-        $this->numKms = $numKms;
-    }
-    public function setNumPiso($numPiso)
-    {
-        $this->numPiso = $numPiso;
-    }
-    public function setPrecioBase($precioBase)
-    {
-        $this->precioBase = $precioBase;
-    }
-    public function setTiempoRecorrido($tiempoRecorrido)
-    {
-        $this->tiempoRecorrido = $tiempoRecorrido;
-    }
-    public function setTipoServicio($tipoServicio)
-    {
-        $this->tipoServicio = $tipoServicio;
+        return $this->basePrice;
     }
 
-    // getters
-    public function getAsientosDisp()
+    /**
+     * @param mixed $brandName
+     */
+    public function setBrandName($brandName)
     {
-        return $this->asientosDisp;
+        $this->brandName = $brandName;
     }
-    public function getClaseServicioId()
+
+    /**
+     * @return mixed
+     */
+    public function getBrandName()
     {
-        return $this->claseServicioId;
+        return $this->brandName;
     }
-    public function getCorrida2Id()
+
+    /**
+     * @param mixed $serviceClassDescription
+     */
+    public function setServiceClassDescription($serviceClassDescription)
     {
-        return $this->corrida2Id;
+        $this->serviceClassDescription = $serviceClassDescription;
     }
-    public function getCorridaId()
+
+    /**
+     * @return mixed
+     */
+    public function getServiceClassDescription()
     {
-        return $this->corridaId;
+        return $this->serviceClassDescription;
     }
-    public function getCveDestino()
+
+    /**
+     * @param mixed $companyDescription
+     */
+    public function setCompanyDescription($companyDescription)
     {
-        return $this->cveDestino;
+        $this->companyDescription = $companyDescription;
     }
-    public function getDescripcionClaseServicio()
+
+    /**
+     * @return mixed
+     */
+    public function getCompanyDescription()
     {
-        return $this->descripcionClaseServicio;
+        return $this->companyDescription;
     }
-    public function getDescripcionEmpresa()
+
+    /**
+     * @param mixed $companyId
+     */
+    public function setCompanyId($companyId)
     {
-        return $this->descripcionEmpresa;
+        $this->companyId = $companyId;
     }
-    public function getEmpresaId()
+
+    /**
+     * @return mixed
+     */
+    public function getCompanyId()
     {
-        return $this->empresaId;
+        return $this->companyId;
     }
-    public function getFechaCorrida()
+
+    /**
+     * @param mixed $dateOfArrival
+     */
+    public function setDateOfArrival($dateOfArrival)
     {
-        return $this->fechaCorrida;
+        $this->dateOfArrival = $dateOfArrival;
     }
-    public function getFechorLlegada()
+
+    /**
+     * @return mixed
+     */
+    public function getDateOfArrival()
     {
-        return $this->fechorLlegada;
+        return $this->dateOfArrival;
     }
-    public function getFechorSalida()
+
+    /**
+     * @param mixed $dateOfDeparture
+     */
+    public function setDateOfDeparture($dateOfDeparture)
     {
-        return $this->fechorSalida;
+        $this->dateOfDeparture = $dateOfDeparture;
     }
-    public function getNombreMarca()
+
+    /**
+     * @return mixed
+     */
+    public function getDateOfDeparture()
     {
-        return $this->nombreMarca;
+        return $this->dateOfDeparture;
     }
-    public function getNumKms()
+
+    /**
+     * @param mixed $dateOfRun
+     */
+    public function setDateOfRun($dateOfRun)
     {
-        return $this->numKms;
+        $this->dateOfRun = $dateOfRun;
     }
-    public function getNumPiso()
+
+    /**
+     * @return mixed
+     */
+    public function getDateOfRun()
     {
-        return $this->numPiso;
+        return $this->dateOfRun;
     }
-    public function getPrecioBase()
+
+    /**
+     * @param mixed $destinationCode
+     */
+    public function setDestinationCode($destinationCode)
     {
-        return $this->precioBase;
+        $this->destinationCode = $destinationCode;
     }
-    public function getTiempoRecorrido()
+
+    /**
+     * @return mixed
+     */
+    public function getDestinationCode()
     {
-        return $this->tiempoRecorrido;
+        return $this->destinationCode;
     }
-    public function getTipoServicio()
+
+    /**
+     * @param mixed $floorNumber
+     */
+    public function setFloorNumber($floorNumber)
     {
-        return $this->tipoServicio;
+        $this->floorNumber = $floorNumber;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getFloorNumber()
+    {
+        return $this->floorNumber;
+    }
+
+    /**
+     * @param mixed $idleSeatsNum
+     */
+    public function setIdleSeatsNum($idleSeatsNum)
+    {
+        $this->idleSeatsNum = $idleSeatsNum;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIdleSeatsNum()
+    {
+        return $this->idleSeatsNum;
+    }
+
+    /**
+     * @param mixed $kms
+     */
+    public function setKms($kms)
+    {
+        $this->kms = $kms;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getKms()
+    {
+        return $this->kms;
+    }
+
+    /**
+     * @param mixed $run2Id
+     */
+    public function setRun2Id($run2Id)
+    {
+        $this->run2Id = $run2Id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRun2Id()
+    {
+        return $this->run2Id;
+    }
+
+    /**
+     * @param mixed $runDuration
+     */
+    public function setRunDuration($runDuration)
+    {
+        $this->runDuration = $runDuration;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRunDuration()
+    {
+        return $this->runDuration;
+    }
+
+    /**
+     * @param mixed $runId
+     */
+    public function setRunId($runId)
+    {
+        $this->runId = $runId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRunId()
+    {
+        return $this->runId;
+    }
+
+    /**
+     * @param mixed $serviceClassId
+     */
+    public function setServiceClassId($serviceClassId)
+    {
+        $this->serviceClassId = $serviceClassId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getServiceClassId()
+    {
+        return $this->serviceClassId;
+    }
+
+    /**
+     * @param mixed $serviceType
+     */
+    public function setServiceType($serviceType)
+    {
+        $this->serviceType = $serviceType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getServiceType()
+    {
+        return $this->serviceType;
+    }
+
+
 }
