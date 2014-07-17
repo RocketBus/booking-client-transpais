@@ -13,7 +13,9 @@ class TicketToBlockFactory
     static public function create(Ticket $ticket) {
 
         $formattedDateOfRun = $ticket->getDateOfRun()->format('c');
+        $ticketId = $ticket->getTicketId();
         $ticket_to_block = array(
+            'boletoId' => ((isset($ticketId))? $ticketId:null),
             'categoriaId' => $ticket->getCategoryId(),
             'corridaId' => $ticket->getRunId(),
             'destinoId' => $ticket->getDestinationId(),

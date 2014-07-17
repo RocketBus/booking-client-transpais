@@ -44,11 +44,9 @@ class RequestConfirmPaymentFactory
         foreach ($params['tickets_to_confirm'] as $ticket) {
             if (!($ticket instanceof Ticket)) {
                 throw new TypeException('Tickets must be an array of tickets');
-            } else {
-                $tickets_to_confirm[] = TicketToBlockFactory::create($ticket);
             }
         }
-        $requestConfirmPayment->setTicketsToConfirm($tickets_to_confirm);
+        $requestConfirmPayment->setTicketsToConfirm($params['tickets_to_confirm']);
 
         if (!is_bool($params['is_return'])) {
             throw new TypeException('Es Regreso must be a boolean');

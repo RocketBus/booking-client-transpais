@@ -15,6 +15,23 @@ class RequestBlockTicket
     protected $pos_id;
     protected $transaction_num; //numOperacion
     protected $ticket;
+    protected $base_price;
+
+    /**
+     * @param mixed $base_price
+     */
+    public function setBasePrice($base_price)
+    {
+        $this->base_price = $base_price;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBasePrice()
+    {
+        return $this->base_price;
+    }
 
     /**
      * @param mixed $pos_id

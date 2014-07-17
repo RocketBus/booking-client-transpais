@@ -8,6 +8,7 @@
 
 namespace Transpais\Service;
 
+use SebastianBergmann\Exporter\Exception;
 use Transpais\Type\Errors\SoapException;
 use Transpais\Type\RequestBlockTicket;
 use Transpais\Type\RequestConfirmPayment;
@@ -141,14 +142,18 @@ class Client
     {
         $service_type = 'bloquearAsientos';
 
+        $tickets_to_confirm = $requestConfirmPayment->getTicketsToConfirm();
+        $formattedTicketsToConfirm = $this->prepareTicketsToConfirm($tickets_to_confirm);
+
         $service_params = array(
             'in0' => $requestConfirmPayment->getClientId(), // client ID (corridaId)
             'in1' => $requestConfirmPayment->getUserId(), // user ID (usuarioId)
             'in2' => $requestConfirmPayment->getCompanyId(), // company Id (empresaVoucherId - empresaId from corrida) objeto corrida
             'in3' => $requestConfirmPayment->getCard(), // card array (tarjeta)
-            'in4' => $requestConfirmPayment->getTicketsToConfirm(), // tickets array (boletos)
+            'in4' => $formattedTicketsToConfirm, // tickets array (boletos)
             'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
         );
+
 
         $soap_param = array(
             'confirmarVentaTarjeta' => $service_params
@@ -156,22 +161,86 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        $response = $this->normalizeSingleObject($soap_response->out->Boleto);
+        $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
-        return $response;
+        if (!$this->verifyTicketsWereConfirmed($responseArray)){
+            throw new RequestException('Payment of ticket cannot be confirmed with bus line');
+        }
+
+        $confirmedTickets = $this->assignTicketNumberToTicketsInArray($requestConfirmPayment->getTicketsToConfirm(), $responseArray);
+
+        return $confirmedTickets;
+    }
+
+    protected function prepareTicketsToConfirm(array $tickets)
+    {
+        foreach($tickets as $ticket) {
+            $tickets_to_block[] = TicketToBlockFactory::create($ticket);
+        }
+
+        return $tickets_to_block;
+    }
+
+    protected function assignTicketNumberToTicketsInArray($ticketsToConfirm, $responseTickets)
+    {
+        foreach ($ticketsToConfirm as $ticketToConfirm) {
+            $confirmedTicket = $this->findTicketBySeatNumber($ticketToConfirm->getSeatNumber(), $responseTickets);
+            if ($confirmedTicket === false) {
+                throw new RequestException('Payment of ticket cannot be confirmed with bus line');
+            }
+
+            $ticketToConfirm->setTicketId($confirmedTicket->boletoId);
+            $ticketToConfirm->setTransactionNum($confirmedTicket->numOperacion);
+            $confirmedTickets[] = $ticketToConfirm;
+        }
+
+        return $confirmedTickets;
+    }
+
+    protected function findTicketBySeatNumber($haystack, $tickets)
+    {
+        foreach ($tickets as $ticket) {
+            if ($ticket->numAsiento === $haystack) {
+                return $ticket;
+            }
+        }
+
+        return false;
+    }
+
+    protected function verifyTicketsWereConfirmed($tickets)
+    {
+        foreach ($tickets as $ticket) {
+            if ($ticket->numOperacion === null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected function callSoapServiceByType($type, $params)
     {
 
-        $response = $this->_soap_client->__soapCall($type, $params, array('trace' => 1));
+        $response = $this->soap_client->__soapCall($type, $params, array('trace' => true));
 
         return $response;
     }
 
     public function setSoapClient($soapClient)
     {
-        $this->_soap_client = $soapClient;
+        $this->soap_client = $soapClient;
+    }
+
+    protected function normalizePaymentConfirmationToArray($object)
+    {
+        if (!is_array($object)) {
+            $array[] = $object;
+        } else {
+            $array = $object;
+        }
+
+        return $array;
     }
 
     protected function normalizeResponseToRun($response)
