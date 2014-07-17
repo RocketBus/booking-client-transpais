@@ -1,0 +1,8 @@
+/.idea/*
+src/Transpais/Service/phpunit.phar
+src/Transpais/Service/Test.php
+src/Transpais/Service/Client.bk.php
+/vendor
+/.DS_Store
+src/.DS_Store
+

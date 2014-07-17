@@ -1,0 +1,28 @@
+{
+    "name": "vendor_name/package_name",
+    "description": "description_text",
+    "minimum-stability": "stable",
+    "license": "proprietary",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/degaray/mock-soapclient.git"
+        }
+    ],
+    "authors": [
+        {
+            "name": "Xavier de Garay",
+            "email": "degaray@yahoo.com"
+        }
+    ],
+    "require":
+    {
+        "phpunit/phpunit": "4.1.3",
+        "degaray/mock-soapclient": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Transpais": "src/"
+        }
+    }
+}
