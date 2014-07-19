@@ -3,12 +3,6 @@
     "description": "Client for the Transpais webservice",
     "minimum-stability": "stable",
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/degaray/mock-soapclient.git"
-        }
-    ],
     "authors": [
         {
             "name": "Xavier de Garay",
@@ -18,7 +12,7 @@
     "require":
     {
         "phpunit/phpunit": "4.1.3",
-        "degaray/mock-soapclient": "dev-master"
+        "degaray/mock-soapclient": "0.0.4"
     },
     "autoload": {
         "psr-0": {
