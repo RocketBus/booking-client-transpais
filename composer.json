@@ -1,8 +1,8 @@
 {
-    "name": "vendor_name/package_name",
-    "description": "description_text",
+    "name": "rocketbus/booking-client-transpais",
+    "description": "Client for the Transpais webservice",
     "minimum-stability": "stable",
-    "license": "proprietary",
+    "license": "MIT",
     "repositories": [
         {
             "type": "vcs",
