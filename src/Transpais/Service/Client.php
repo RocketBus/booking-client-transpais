@@ -50,6 +50,7 @@ class Client
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
         $corrida = $soap_response->out->Corrida;
+
         $response = $this->normalizeResponseToRun($corrida);
 
         return $response;
@@ -154,7 +155,6 @@ class Client
             'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
         );
 
-
         $soap_param = array(
             'confirmarVentaTarjeta' => $service_params
         );
@@ -163,10 +163,9 @@ class Client
 
         $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
-        if (!$this->verifyTicketsWereConfirmed($responseArray)){
+        if ($this->verifyTicketsWereConfirmed($responseArray) == false){
             throw new RequestException('Payment of ticket cannot be confirmed with bus line');
         }
-
         $confirmedTickets = $this->assignTicketNumberToTicketsInArray($requestConfirmPayment->getTicketsToConfirm(), $responseArray);
 
         return $confirmedTickets;
@@ -185,9 +184,6 @@ class Client
     {
         foreach ($ticketsToConfirm as $ticketToConfirm) {
             $confirmedTicket = $this->findTicketBySeatNumber($ticketToConfirm->getSeatNumber(), $responseTickets);
-            if ($confirmedTicket === false) {
-                throw new RequestException('Payment of ticket cannot be confirmed with bus line');
-            }
 
             $ticketToConfirm->setTicketId($confirmedTicket->boletoId);
             $ticketToConfirm->setTransactionNum($confirmedTicket->numOperacion);
@@ -201,17 +197,17 @@ class Client
     {
         foreach ($tickets as $ticket) {
             if ($ticket->numAsiento === $haystack) {
-                return $ticket;
+                $response = $ticket;
             }
         }
 
-        return false;
+        return $response;
     }
 
     protected function verifyTicketsWereConfirmed($tickets)
     {
         foreach ($tickets as $ticket) {
-            if ($ticket->numOperacion === null) {
+            if ($ticket->numOperacion === null || $ticket->numOperacion == -1) {
                 return false;
             }
         }
@@ -221,8 +217,8 @@ class Client
 
     protected function callSoapServiceByType($type, $params)
     {
-
-        $response = $this->soap_client->__soapCall($type, $params, array('trace' => true));
+        $options = array('trace' => 1, 'exception' => 1);
+        $response = $this->soap_client->__soapCall($type, $params, array('trace' => $options));
 
         return $response;
     }

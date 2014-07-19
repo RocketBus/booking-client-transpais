@@ -15,6 +15,7 @@ class SeatFactory
     static public function create($seatParams)
     {
         $seat = new Seat();
+
         if (!is_string($seatParams->asiento)) {
             throw new TypeException('Asiento should be a string');
         } else {
