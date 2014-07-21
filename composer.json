@@ -9,8 +9,10 @@
             "email": "degaray@yahoo.com"
         }
     ],
-    "require":
-    {
+    "require": {
+        "php": ">=5.4"
+    },
+    "require-dev": {
         "phpunit/phpunit": "4.1.3",
         "degaray/mock-soapclient": "0.0.4"
     },
