@@ -96,6 +96,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Transpais\Type\Seat', $responseSeatMap[0]);
     }
 
+    public function test_if_normalize_response_seat_map_returns_a_valid_response_seat_map_object_one_seat_response()
+    {
+        $dummySoapResponse = self::createDummyResponseSeatMapOneSeat();
+
+        $this->fakeSoapClient->setResponse($dummySoapResponse);
+
+        $requestSeatMap = self::createDummyRequestSeatMap();
+
+        $responseSeatMap = $this->client->getSeatMap($requestSeatMap);
+
+        $this->assertInstanceOf('Transpais\Type\ResponseSeatMap', $responseSeatMap);
+        $this->assertInstanceOf('Transpais\Type\Seat', $responseSeatMap[0]);
+    }
+
     public function test_if_ticket_id_is_assigned_to_the_ticket_object_in_blockticket()
     {
         $dummySoapResponse = self::createDummyBlockTicketResponseObject('10000002910666');
@@ -211,10 +225,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $dummySoapResponse = new \stdClass();
         $dummySoapResponse->out->detallesDiagrama->DetalleDiagrama[0] = (object) array(
-            'asiento' => 'P009',
-            'coluna' => null,
-            'fila' => null,
-            'status' => 'DP'
+                'asiento' => 'P009',
+                'coluna' => null,
+                'fila' => null,
+                'status' => 'DP'
         );
         return $dummySoapResponse;
     }
