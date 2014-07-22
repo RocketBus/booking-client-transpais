@@ -211,10 +211,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $dummySoapResponse = new \stdClass();
         $dummySoapResponse->out->detallesDiagrama->DetalleDiagrama[0] = (object) array(
-            'asiento' => 'P009',
-            'coluna' => null,
-            'fila' => null,
-            'status' => 'DP'
+                'asiento' => 'P009',
+                'coluna' => null,
+                'fila' => null,
+                'status' => 'DP'
         );
         return $dummySoapResponse;
     }

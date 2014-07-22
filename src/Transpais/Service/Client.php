@@ -16,10 +16,12 @@ use Transpais\Type\RequestRuns;
 use Transpais\Type\RequestSeatMap;
 use Transpais\Type\ResponseSeatMap;
 use Transpais\Type\ResponseRuns;
+use Transpais\Type\StopsResponseFactory;
 use Transpais\Type\TicketToBlockFactory;
 use Transpais\Type\RunFactory;
 use Transpais\Type\Errors\RequestException;
 use Transpais\Type\SeatFactory;
+
 
 class Client
 {
@@ -54,6 +56,46 @@ class Client
         $response = $this->normalizeResponseToRun($corrida);
 
         return $response;
+    }
+
+    public function getAllOrigins($companyId)
+    {
+        $service_type = 'buscarOrigenInternet';
+
+        $service_params = array(
+            'in0' => $companyId
+        );
+
+        $soap_param =  array(
+            'ventaService' => $service_params
+        );
+
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+
+        $origins = StopsResponseFactory::create($soap_response);
+
+        return $origins;
+
+    }
+
+    public function getAllDestinationsOfAnOrigin($companyId, $originId) {
+
+        $service_type = 'buscarDestinoInternet';
+
+        $service_params = array(
+            'in0' => $companyId,
+            'in1' => $originId
+        );
+
+        $soap_param =  array(
+            'ventaService' => $service_params
+        );
+
+        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+
+        $destinations = StopsResponseFactory::create($soap_response);
+
+        return $destinations;
     }
 
     public function getSeatMap(RequestSeatMap $requestSeatMap)
