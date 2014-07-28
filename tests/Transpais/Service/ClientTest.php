@@ -82,7 +82,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\DateTime', $runs[0]->getDateOfDeparture());
     }
 
-    public function test_if_normalize_response_seat_map_returns_a_valid_response_seat_map_object()
+    public function test_if_response_seat_map_factory_returns_a_valid_response_seat_map_object()
     {
         $dummySoapResponse = self::createDummyResponseSeatMap();
 
@@ -93,7 +93,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $responseSeatMap = $this->client->getSeatMap($requestSeatMap);
 
         $this->assertInstanceOf('Transpais\Type\ResponseSeatMap', $responseSeatMap);
-        $this->assertInstanceOf('Transpais\Type\Seat', $responseSeatMap[0]);
+        $seatTypes = $responseSeatMap->getSeatTypes();
+        $this->assertNotEmpty($seatTypes[0]);
+        $seats = $responseSeatMap->getSeats();
+        $this->assertInstanceOf('Transpais\Type\Seat', $seats[0]);
     }
 
     public function test_if_ticket_id_is_assigned_to_the_ticket_object_in_blockticket()
@@ -215,6 +218,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
                 'coluna' => null,
                 'fila' => null,
                 'status' => 'DP'
+        );
+        $dummySoapResponse->out->disponibilidad->Disponibilidad[0] = (object) array(
+            'cantidad' => 36,
+            'categoriaId' => 1,
+            'descCategoria' => 'ADULTO',
+            'precio' => '315.0',
+            'serviciosCorrida' => new \stdClass()
         );
         return $dummySoapResponse;
     }
