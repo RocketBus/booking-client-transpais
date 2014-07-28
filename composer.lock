@@ -1,14 +1,13 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
-        "This file is @generated automatically"
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "f18ff9199786a9f3c30855fe811f8b3f",
+    "hash": "f6394f04f6da709274618d6af55c92d6",
     "packages": [
         {
             "name": "degaray/mock-soapclient",
-            "version": "dev-master",
+            "version": "0.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/degaray/mock-soapclient.git",
@@ -29,6 +28,7 @@
                     "": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD Style"
             ],
@@ -40,10 +40,6 @@
             ],
             "description": "This class is used to overwrite the functionality of the soapclient. It is very usefull when mocking objects expected from soap calls to web sevices in unit testing.",
             "homepage": "https://github.com/degaray/mock-soapclient",
-            "support": {
-                "source": "https://github.com/degaray/mock-soapclient/tree/master",
-                "issues": "https://github.com/degaray/mock-soapclient/issues"
-            },
             "time": "2014-07-16 23:38:26"
         },
         {
@@ -750,9 +746,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "degaray/mock-soapclient": 20
-    },
+    "stability-flags": [
+
+    ],
     "platform": [
 
     ],
