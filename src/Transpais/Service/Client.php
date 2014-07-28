@@ -16,6 +16,7 @@ use Transpais\Type\RequestRuns;
 use Transpais\Type\RequestSeatMap;
 use Transpais\Type\ResponseSeatMap;
 use Transpais\Type\ResponseRuns;
+use Transpais\Type\ResponseSeatMapFactory;
 use Transpais\Type\StopsResponseFactory;
 use Transpais\Type\TicketToBlockFactory;
 use Transpais\Type\RunFactory;
@@ -118,7 +119,7 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        $response = $this->normalizeResponseSeatMap($soap_response->out);
+        $response = ResponseSeatMapFactory::create($soap_response);
 
         return $response;
     }
@@ -296,23 +297,5 @@ class Client
         }
 
         return $responseRuns;
-    }
-
-    protected function normalizeResponseSeatMap($response)
-    {
-        $responseSeatMap = new ResponseSeatMap();
-
-        $detalleDiagrama = $response->detallesDiagrama->DetalleDiagrama;
-        if (is_array($detalleDiagrama)) {
-            foreach ($detalleDiagrama as $seat) {
-                $seatObj = SeatFactory::create($seat);
-                $responseSeatMap->append($seatObj);
-            }
-        } else {
-            $seatObj = SeatFactory::create($response);
-            $responseSeatMap->append($seatObj);
-        }
-
-        return $responseSeatMap;
     }
 }
