@@ -12,7 +12,7 @@ use Transpais\Type\Errors\TypeException;
 
 class SeatFactory
 {
-    static public function create($seatParams)
+    public static function create($seatParams)
     {
         $seat = new Seat();
 
@@ -34,4 +34,4 @@ class SeatFactory
         return $seat;
     }
 
-} 
+}

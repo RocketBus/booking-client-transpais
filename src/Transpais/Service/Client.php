@@ -14,15 +14,12 @@ use Transpais\Type\RequestBlockTicket;
 use Transpais\Type\RequestConfirmPayment;
 use Transpais\Type\RequestRuns;
 use Transpais\Type\RequestSeatMap;
-use Transpais\Type\ResponseSeatMap;
 use Transpais\Type\ResponseRuns;
 use Transpais\Type\ResponseSeatMapFactory;
 use Transpais\Type\StopsResponseFactory;
 use Transpais\Type\TicketToBlockFactory;
 use Transpais\Type\RunFactory;
 use Transpais\Type\Errors\RequestException;
-use Transpais\Type\SeatFactory;
-
 
 class Client
 {
@@ -31,7 +28,7 @@ class Client
     /**
      * Initializing the SoapClient is needed on each call to this class
      */
-    public function __construct( $soapClient)
+    public function __construct($soapClient)
     {
         $this->setSoapClient($soapClient);
     }
@@ -79,8 +76,8 @@ class Client
 
     }
 
-    public function getAllDestinationsOfAnOrigin($companyId, $originId) {
-
+    public function getAllDestinationsOfAnOrigin($companyId, $originId)
+    {
         $service_type = 'buscarDestinoInternet';
 
         $service_params = array(
@@ -206,7 +203,7 @@ class Client
 
         $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
-        if ($this->verifyTicketsWereConfirmed($responseArray) == false){
+        if ($this->verifyTicketsWereConfirmed($responseArray) == false) {
             throw new RequestException('Payment of ticket cannot be confirmed with bus line');
         }
         $confirmedTickets = $this->assignTicketNumberToTicketsInArray($requestConfirmPayment->getTicketsToConfirm(), $responseArray);
@@ -216,7 +213,7 @@ class Client
 
     protected function prepareTicketsToConfirm(array $tickets)
     {
-        foreach($tickets as $ticket) {
+        foreach ($tickets as $ticket) {
             $tickets_to_block[] = TicketToBlockFactory::create($ticket);
         }
 

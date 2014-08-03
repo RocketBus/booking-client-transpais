@@ -8,7 +8,6 @@
 
 namespace Transpais\Type;
 
-
 class Seat
 {
     protected $seatNumber;

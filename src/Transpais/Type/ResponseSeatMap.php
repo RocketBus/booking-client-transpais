@@ -8,8 +8,6 @@
 
 namespace Transpais\Type;
 
-use Transpais\Type\Errors\TypeException;
-
 class ResponseSeatMap
 {
     protected $seats;

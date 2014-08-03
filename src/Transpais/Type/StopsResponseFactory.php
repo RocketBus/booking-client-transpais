@@ -8,12 +8,11 @@
 
 namespace Transpais\Type;
 
-
 use Transpais\Type\Errors\TypeException;
 
 class StopsResponseFactory
 {
-    static public function create($AllOrigins)
+    public static function create($AllOrigins)
     {
         if (!is_array($AllOrigins->out->Parada)) {
             $paradaObj[] = $AllOrigins->out->Parada;
@@ -39,4 +38,4 @@ class StopsResponseFactory
 
         return $origins;
     }
-} 
+}

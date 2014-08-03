@@ -8,7 +8,6 @@
 
 namespace Transpais\Type;
 
-
 class Ticket
 {
     protected $ticket_id;

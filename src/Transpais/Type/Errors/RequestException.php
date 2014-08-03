@@ -8,8 +8,7 @@
 
 namespace Transpais\Type\Errors;
 
-
 class RequestException extends \Exception
 {
 
-} 
+}

@@ -8,12 +8,11 @@
 
 namespace Transpais\Type;
 
-
 use Transpais\Type\Errors\TypeException;
 
 class RequestConfirmPaymentFactory
 {
-    static public function create($params)
+    public static function create($params)
     {
         $requestConfirmPayment = new RequestConfirmPayment();
 
