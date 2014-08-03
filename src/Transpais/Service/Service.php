@@ -2,6 +2,6 @@
 
 namespace Transpais\Service;
 
-class Service {
-
+class Service
+{
 }

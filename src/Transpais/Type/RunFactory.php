@@ -12,7 +12,7 @@ use Transpais\Type\Errors\TypeException;
 
 class RunFactory
 {
-    static public function create($corrida)
+    public static function create($corrida)
     {
         $run = new Run();
 
@@ -87,4 +87,4 @@ class RunFactory
 
         return $run;
     }
-} 
+}

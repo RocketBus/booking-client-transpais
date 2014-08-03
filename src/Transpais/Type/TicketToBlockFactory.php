@@ -10,8 +10,8 @@ namespace Transpais\Type;
 
 class TicketToBlockFactory
 {
-    static public function create(Ticket $ticket) {
-
+    public static function create(Ticket $ticket)
+    {
         $formattedDateOfRun = $ticket->getDateOfRun()->format('c');
         $ticketId = $ticket->getTicketId();
         $ticket_to_block = array(
@@ -29,4 +29,4 @@ class TicketToBlockFactory
         return $ticket_to_block;
 
     }
-} 
+}

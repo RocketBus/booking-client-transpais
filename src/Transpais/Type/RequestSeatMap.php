@@ -8,9 +8,6 @@
 
 namespace Transpais\Type;
 
-use Transpais\Type\Errors\RequestException;
-use Transpais\Type\RequestRuns;
-
 class RequestSeatMap
 {
     protected $origin_id;
@@ -116,4 +113,4 @@ class RequestSeatMap
         return $this->run_id;
     }
 
-} 
+}

@@ -16,8 +16,6 @@ use Transpais\Type\RequestSeatMapFactory;
 use Transpais\Type\Ticket;
 use Transpais\Type\RequestConfirmPaymentFactory;
 
-
-
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
     protected $fakeSoapClient;
@@ -210,7 +208,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->client->confirmPayment($requestConfirmPayment);
     }
 
-    static public function createDummyResponseSeatMap()
+    public static function createDummyResponseSeatMap()
     {
         $dummySoapResponse = new \stdClass();
         $dummySoapResponse->out->detallesDiagrama->DetalleDiagrama[0] = (object) array(
@@ -226,10 +224,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'precio' => '315.0',
             'serviciosCorrida' => new \stdClass()
         );
+
         return $dummySoapResponse;
     }
 
-    static public function createDummyResponseSeatMapOneSeat()
+    public static function createDummyResponseSeatMapOneSeat()
     {
         $dummySoapResponse = (object) array(
             'out' => (object) array(
@@ -247,7 +246,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         return $dummySoapResponse;
     }
 
-    static public function createDummyRequestSeatMap()
+    public static function createDummyRequestSeatMap()
     {
         $tomorrow = new \DateTime('tomorrow');
         $params = array(
@@ -263,7 +262,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         return $requestSeatMap;
     }
 
-    static public function createDummyRequestConfirmPayment()
+    public static function createDummyRequestConfirmPayment()
     {
         $card = array(
             'autorizacion' => '1234',
@@ -283,7 +282,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         return RequestConfirmPaymentFactory::create($confirmPaymentParams);
     }
 
-    static public function createDummyConsultaCorridasResponseObject()
+    public static function createDummyConsultaCorridasResponseObject()
     {
         $dummyresponse = new \stdClass();
         $dummyresponse->out->Corrida[] = (object) array(
@@ -308,7 +307,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         return $dummyresponse;
     }
-    static public function createDummyBlockTicketResponseObject($ticket_id = null)
+    public static function createDummyBlockTicketResponseObject($ticket_id = null)
     {
         $dummySoapResponse = (object) array(
             'out' => (object) array(
@@ -330,7 +329,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         return $dummySoapResponse;
     }
 
-    static public function createDummyBlockTicketRequestObjectWithoutTicket()
+    public static function createDummyBlockTicketRequestObjectWithoutTicket()
     {
         $requestBlockTicket = new RequestBlockTicket();
         $requestBlockTicket->setUserId(619);
@@ -341,7 +340,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         return $requestBlockTicket;
     }
 
-    static public function createDummyTicketObject($id)
+    public static function createDummyTicketObject($id)
     {
         $ticket_to_block = new Ticket();
         if ($id) {
@@ -359,5 +358,4 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         return $ticket_to_block;
     }
 
-
-} 
+}

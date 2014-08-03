@@ -8,13 +8,11 @@
 
 namespace Transpais\Type;
 
-
-use SebastianBergmann\Exporter\Exception;
 use Transpais\Type\Errors\TypeException;
 
 class RequestSeatMapFactory
 {
-    static public function create($params)
+    public static function create($params)
     {
         $requestSeatMap = new RequestSeatMap();
         $requestSeatMap->setOriginId($params['origin_id']);
@@ -33,4 +31,4 @@ class RequestSeatMapFactory
         return $requestSeatMap;
     }
 
-} 
+}

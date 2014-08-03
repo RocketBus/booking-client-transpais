@@ -8,7 +8,6 @@
 
 namespace Transpais\Type;
 
-
 class Run
 {
     protected $idleSeatsNum;
@@ -300,6 +299,5 @@ class Run
     {
         return $this->serviceType;
     }
-
 
 }

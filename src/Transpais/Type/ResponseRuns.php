@@ -8,17 +8,16 @@
 
 namespace Transpais\Type;
 
-use Transpais\Type\Errors;
 use Transpais\Type\Errors\TypeException;
 
 class ResponseRuns extends \ArrayObject
 {
     public function append($corrida)
     {
-        if (!$corrida instanceof Run ) {
+        if (!$corrida instanceof Run) {
             throw new TypeException("A instance of Corrida is required");
         }
 
         parent::append($corrida);
     }
-} 
+}

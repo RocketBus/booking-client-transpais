@@ -8,7 +8,6 @@
 
 namespace Transpais\Type;
 
-
 class RequestConfirmPayment
 {
     protected $client_id;
@@ -114,5 +113,4 @@ class RequestConfirmPayment
         return $this->user_id;
     }
 
-
-} 
+}
