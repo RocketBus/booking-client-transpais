@@ -28,6 +28,7 @@ class Run
     protected $basePrice;
     protected $runDuration;
     protected $serviceType;
+    protected $categories; //@var Category[]
 
     /**
      * @param mixed $basePrice
@@ -299,6 +300,35 @@ class Run
     public function getServiceType()
     {
         return $this->serviceType;
+    }
+
+    /**
+     * @param mixed $categories
+     */
+    public function setCategories($categories)
+    {
+        $this->categories = $categories;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCategories()
+    {
+        return $this->categories;
+    }
+
+
+
+    public function getCategoryByType($type)
+    {
+       /* foreach ($this->getCategories() as $category) {
+            if ($category->getId() == $type) {
+                return $category;
+            }
+        }*/
+        return $type;
+       // throw new \Exception("Seat category not found");
     }
 
 
