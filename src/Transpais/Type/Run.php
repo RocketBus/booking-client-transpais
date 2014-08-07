@@ -318,18 +318,4 @@ class Run
         return $this->categories;
     }
 
-
-
-    public function getCategoryByType($type)
-    {
-       /* foreach ($this->getCategories() as $category) {
-            if ($category->getId() == $type) {
-                return $category;
-            }
-        }*/
-        return $type;
-       // throw new \Exception("Seat category not found");
-    }
-
-
 }
