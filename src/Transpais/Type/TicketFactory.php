@@ -70,6 +70,7 @@ class TicketFactory
             $ticket_to_block->setBasePrice(floatval($params['base_price']));
         }
 
+
         return $ticket_to_block;
     }
 } 

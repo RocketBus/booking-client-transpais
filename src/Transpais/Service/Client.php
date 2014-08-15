@@ -154,6 +154,7 @@ class Client
         $ticket = $RequestBlockTicket->getTicket();
         $ticket->setTicketId($Boleto->boletoId);
         $ticket->setPrice($Boleto->precio);
+        $ticket->setTransactionNum($Boleto->numOperacion);
 
         return $ticket;
     }
@@ -184,7 +185,7 @@ class Client
 
     public function confirmPayment(RequestConfirmPayment $requestConfirmPayment)
     {
-        $service_type = 'bloquearAsientos';
+        $service_type = 'confirmarVentaTarjeta';
 
         $tickets_to_confirm = $requestConfirmPayment->getTicketsToConfirm();
         $formattedTicketsToConfirm = $this->prepareTicketsToConfirm($tickets_to_confirm);
@@ -238,9 +239,11 @@ class Client
 
     protected function findTicketBySeatNumber($haystack, $tickets)
     {
+
         foreach ($tickets as $ticket) {
-            if ($ticket->numAsiento === $haystack) {
-                $response = $ticket;
+            if ($ticket->numAsiento == $haystack) {
+                (object) $response = $ticket;
+                break;
             }
         }
 
@@ -252,6 +255,7 @@ class Client
         foreach ($tickets as $ticket) {
             if ($ticket->numOperacion === null || $ticket->numOperacion == -1) {
                 return false;
+
             }
         }
 

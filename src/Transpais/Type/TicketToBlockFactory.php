@@ -24,6 +24,7 @@ class TicketToBlockFactory
             'numAsiento' => $ticket->getSeatNumber(),
             'origenId' => $ticket->getOriginId(),
             'precio' => $ticket->getBasePrice(),
+            'numOperacion'=>$ticket->getTransactionNum(),
         );
 
         return $ticket_to_block;
