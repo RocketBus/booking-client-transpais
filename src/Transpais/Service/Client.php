@@ -23,7 +23,6 @@ use Transpais\Type\RunFactory;
 use Transpais\Type\Errors\RequestException;
 use Transpais\Type\SeatFactory;
 
-
 class Client
 {
     protected $soap_client;
@@ -31,7 +30,7 @@ class Client
     /**
      * Initializing the SoapClient is needed on each call to this class
      */
-    public function __construct( $soapClient)
+    public function __construct($soapClient)
     {
         $this->setSoapClient($soapClient);
     }
@@ -79,7 +78,8 @@ class Client
 
     }
 
-    public function getAllDestinationsOfAnOrigin($companyId, $originId) {
+    public function getAllDestinationsOfAnOrigin($companyId, $originId)
+    {
 
         $service_type = 'buscarDestinoInternet';
 
@@ -231,6 +231,9 @@ class Client
 
             $ticketToConfirm->setTicketId($confirmedTicket->boletoId);
             $ticketToConfirm->setTransactionNum($confirmedTicket->numOperacion);
+            $ticketToConfirm->setFolioNumber($confirmedTicket->numFolioSistema);
+
+
             $confirmedTickets[] = $ticketToConfirm;
         }
 
