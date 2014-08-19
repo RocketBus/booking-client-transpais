@@ -322,6 +322,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
                     'nombrePasajero' => 'Jonh Secada',
                     'numAsiento' => 'P007',
                     'numOperacion' => '-1',
+                    'numFolioSistema' =>'4567',
                     'origenId' => 1886,
                     'precio' => '315'
                 )
