@@ -180,6 +180,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $confirmTicket2 = self::createDummyBlockTicketResponseObject('10000002910667');
         $confirmTicket2->out->Boleto->asientoId = 'P006';
         $confirmTicket2->out->Boleto->numOperacion = 'Array';
+        $confirmTicket2->out->Boleto->numFolioSistema = '456788';
         $confirmTickets = (object) array(
             'out' => (object) array(
                     'Boleto' => array(
