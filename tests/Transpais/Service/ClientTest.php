@@ -31,7 +31,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->fakeSoapClient = new \MockSoapClient('fake://wdsl');
-        $this->client = new Client($this->fakeSoapClient);
+        $config = array('usuario' => 'CLICKBUS',
+                        'password' => 'clickbus');
+        $this->client = new Client($this->fakeSoapClient, $config);
     }
 
     public function test_if_normalize_response_to_run_returns_a_valid_runs_object()
