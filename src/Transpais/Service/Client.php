@@ -26,13 +26,18 @@ use Transpais\Type\SeatFactory;
 class Client
 {
     protected $soap_client;
+    protected $usuario;
+    protected $password;
+
 
     /**
      * Initializing the SoapClient is needed on each call to this class
      */
-    public function __construct($soapClient)
+    public function __construct($soapClient, $config)
     {
         $this->setSoapClient($soapClient);
+        $this->usuario = $config['usuario'];
+        $this->password = $config['password'];
     }
 
     public function getRunsInADay(RequestRuns $requestRuns)
@@ -44,6 +49,8 @@ class Client
             'in0' => $requestRuns->getOriginId(), // origin Place ID (origenId)
             'in1' => $requestRuns->getDestinationId(), // destination Place ID (destinoId)
             'in2' => $formattedDateOfRun,
+            'in3' => $this->usuario,
+            'in4' => $this->password
         );
 
         $soap_param = array(
@@ -63,7 +70,9 @@ class Client
         $service_type = 'buscarOrigenInternet';
 
         $service_params = array(
-            'in0' => $companyId
+            'in0' => $companyId,
+            'in1' => $this->usuario,
+            'in2' => $this->password
         );
 
         $soap_param =  array(
@@ -85,7 +94,9 @@ class Client
 
         $service_params = array(
             'in0' => $companyId,
-            'in1' => $originId
+            'in1' => $originId,
+            'in2' => $this->usuario,
+            'in3' => $this->password
         );
 
         $soap_param =  array(
@@ -111,6 +122,8 @@ class Client
             'in3' => $requestSeatMap->getDestinationId(), // destination Place ID (destinoId)
             'in4' => $requestSeatMap->getPosId(),
             'in5' => $requestSeatMap->getSaleTypeId(),
+            'in6' => $this->usuario,
+            'in7' => $this->password
         );
 
         $soap_param = array(
@@ -136,6 +149,8 @@ class Client
             'in2' => $RequestBlockTicket->getPosId(),
             'in3' => $RequestBlockTicket->getTransactionNum(),
             'in4' => $tickets_to_block,
+            'in5' => $this->usuario,
+            'in6' => $this->password
         );
 
         $soap_param = array(
@@ -167,6 +182,9 @@ class Client
         $service_params = array(
             'in0' => $ticket_id, // Ticket ID (boletoId)
             'in1' => $user_id, // User ID (usuarioId)
+            'in2' => $this->usuario,
+            'in3' => $this->password
+
         );
 
         $soap_param = array(
@@ -197,6 +215,8 @@ class Client
             'in3' => $requestConfirmPayment->getCard(), // card array (tarjeta)
             'in4' => $formattedTicketsToConfirm, // tickets array (boletos)
             'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
+            'in6' => $this->usuario,
+            'in7' => $this->password
         );
 
         $soap_param = array(
