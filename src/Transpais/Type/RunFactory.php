@@ -16,7 +16,7 @@ class RunFactory
     {
         $run = new Run();
 
-        if (!is_int($corrida->asientosDisp)) {
+        if ((int)$corrida->asientosDisp) {
             throw new TypeException('Asientos disponibles should be a numeric value');
         } else {
             $run->setIdleSeatsNum($corrida->asientosDisp);
@@ -25,7 +25,7 @@ class RunFactory
         $run->setServiceClassId($corrida->claseServicioId);
         $run->setRun2Id($corrida->corrida2Id);
 
-        if (!is_int($corrida->corridaId)) {
+        if ((int)$corrida->corridaId) {
             throw new TypeException('Corrida id should be a numeric value');
         } else {
             $run->setRunId($corrida->corridaId);
@@ -45,7 +45,7 @@ class RunFactory
             $run->setCompanyDescription($corrida->descripcionEmpresa);
         }
 
-        if (!is_int($corrida->empresaId)) {
+        if ((int) $corrida->empresaId) {
             throw new TypeException('Empresa id should be a numeric value');
         } else {
             $run->setCompanyId($corrida->empresaId);
