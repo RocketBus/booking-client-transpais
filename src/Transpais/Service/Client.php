@@ -58,6 +58,10 @@ class Client
         );
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
+        if(!isset($soap_response->out->Corrida)) {
+            return new ResponseRuns();
+        }
+
         $corrida = $soap_response->out->Corrida;
 
         $response = $this->normalizeResponseToRun($corrida);
@@ -207,6 +211,7 @@ class Client
 
         $tickets_to_confirm = $requestConfirmPayment->getTicketsToConfirm();
         $formattedTicketsToConfirm = $this->prepareTicketsToConfirm($tickets_to_confirm);
+        var_dump($formattedTicketsToConfirm);
 
         $service_params = array(
             'in0' => $requestConfirmPayment->getClientId(), // client ID (corridaId)
