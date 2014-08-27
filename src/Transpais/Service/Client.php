@@ -60,7 +60,7 @@ class Client
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
         if(isset($this->logger))
-            $this->logger->addInfo(print_r($soap_response,true));
+            $this->logger->addNotice(print_r($soap_response,true));
 
         if(!isset($soap_response->out->Corrida)) {
             return new ResponseRuns();
@@ -168,7 +168,7 @@ class Client
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
         if(isset($this->logger))
-            $this->logger->addInfo(print_r($soap_response,true));
+            $this->logger->addNotice(print_r($soap_response,true));
 
         if (is_null($soap_response->out->Boleto->boletoId)) {
             $error_msg = 'The seat you are tying to block is already taken, please select a '.
@@ -205,7 +205,7 @@ class Client
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
         if(isset($this->logger))
-            $this->logger->addInfo(print_r($soap_response,true));
+            $this->logger->addNotice(print_r($soap_response,true));
 
         $status = $soap_response->out->status;
         if ($status !== 'Eliminado') {
@@ -240,10 +240,7 @@ class Client
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
         if(isset($this->logger))
-            $this->logger->addInfo(print_r($soap_response,true));
-
-        if(isset($this->logger))
-            $this->logger->addInfo(print_r($soap_response,true));
+            $this->logger->addNotice(print_r($soap_response,true));
 
         $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
