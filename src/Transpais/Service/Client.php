@@ -28,6 +28,7 @@ class Client
     protected $soap_client;
     protected $usuario;
     protected $password;
+    private $logger;
 
 
     /**
@@ -57,6 +58,9 @@ class Client
             'ventaService' => $service_params
         );
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+
+        if(isset($this->logger))
+            $this->logger->addInfo(print_r($soap_response,true));
 
         if(!isset($soap_response->out->Corrida)) {
             return new ResponseRuns();
@@ -163,6 +167,9 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
+        if(isset($this->logger))
+            $this->logger->addInfo(print_r($soap_response,true));
+
         if (is_null($soap_response->out->Boleto->boletoId)) {
             $error_msg = 'The seat you are tying to block is already taken, please select a '.
                 'different one or unblock this seat first.';
@@ -197,6 +204,9 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
+        if(isset($this->logger))
+            $this->logger->addInfo(print_r($soap_response,true));
+
         $status = $soap_response->out->status;
         if ($status !== 'Eliminado') {
             throw new SoapException('The ticket was either not deleted or was not previously blocked');
@@ -211,7 +221,6 @@ class Client
 
         $tickets_to_confirm = $requestConfirmPayment->getTicketsToConfirm();
         $formattedTicketsToConfirm = $this->prepareTicketsToConfirm($tickets_to_confirm);
-        var_dump($formattedTicketsToConfirm);
 
         $service_params = array(
             'in0' => $requestConfirmPayment->getClientId(), // client ID (corridaId)
@@ -229,6 +238,12 @@ class Client
         );
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+
+        if(isset($this->logger))
+            $this->logger->addInfo(print_r($soap_response,true));
+
+        if(isset($this->logger))
+            $this->logger->addInfo(print_r($soap_response,true));
 
         $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
@@ -329,5 +344,9 @@ class Client
         }
 
         return $responseRuns;
+    }
+
+    public function setLog($logger) {
+        $this->logger = $logger;
     }
 }
