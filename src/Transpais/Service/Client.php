@@ -23,12 +23,15 @@ use Transpais\Type\RunFactory;
 use Transpais\Type\Errors\RequestException;
 use Transpais\Type\SeatFactory;
 
+use Rocket\Bus\Mexico\SharedBundle\BookingEngines\Type\LogEntry;
+
 class Client
 {
     protected $soap_client;
     protected $usuario;
     protected $password;
     private $logger;
+    protected $logEntry;
 
 
     /**
@@ -52,17 +55,18 @@ class Client
             'in2' => $formattedDateOfRun,
             'in3' => $this->usuario,
             'in4' => $this->password
-        );
+            );
 
         $soap_param = array(
             'ventaService' => $service_params
-        );
+            );
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
+        if (isset($this->logger)) {
             $this->logger->addNotice(print_r($soap_response,true));
+        }
 
-        if(!isset($soap_response->out->Corrida)) {
+        if (!isset($soap_response->out->Corrida)) {
             return new ResponseRuns();
         }
 
@@ -81,11 +85,11 @@ class Client
             'in0' => $companyId,
             'in1' => $this->usuario,
             'in2' => $this->password
-        );
+            );
 
         $soap_param =  array(
             'ventaService' => $service_params
-        );
+            );
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
@@ -105,11 +109,11 @@ class Client
             'in1' => $originId,
             'in2' => $this->usuario,
             'in3' => $this->password
-        );
+            );
 
         $soap_param =  array(
             'ventaService' => $service_params
-        );
+            );
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
@@ -132,11 +136,11 @@ class Client
             'in5' => $requestSeatMap->getSaleTypeId(),
             'in6' => $this->usuario,
             'in7' => $this->password
-        );
+            );
 
         $soap_param = array(
             'ventaService' => $service_params
-        );
+            );
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
@@ -159,20 +163,21 @@ class Client
             'in4' => $tickets_to_block,
             'in5' => $this->usuario,
             'in6' => $this->password
-        );
+            );
 
         $soap_param = array(
             'ventaService' => $service_params
-        );
+            );
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
+        if (isset($this->logger)) {
             $this->logger->addNotice(print_r($soap_response,true));
+        }
 
         if (is_null($soap_response->out->Boleto->boletoId)) {
             $error_msg = 'The seat you are tying to block is already taken, please select a '.
-                'different one or unblock this seat first.';
+            'different one or unblock this seat first.';
             throw new RequestException($error_msg);
         }
 
@@ -196,16 +201,17 @@ class Client
             'in2' => $this->usuario,
             'in3' => $this->password
 
-        );
+            );
 
         $soap_param = array(
             'ventaService' => $service_params
-        );
+            );
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
+        if (isset($this->logger)) {
             $this->logger->addNotice(print_r($soap_response,true));
+        }
 
         $status = $soap_response->out->status;
         if ($status !== 'Eliminado') {
@@ -231,20 +237,21 @@ class Client
             'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
             'in6' => $this->usuario,
             'in7' => $this->password
-        );
+            );
 
         $soap_param = array(
             'confirmarVentaTarjeta' => $service_params
-        );
+            );
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
+        if (isset($this->logger)) {
             $this->logger->addNotice(print_r($soap_response,true));
+        }
 
         $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
-        if ($this->verifyTicketsWereConfirmed($responseArray) == false){
+        if ($this->verifyTicketsWereConfirmed($responseArray) == false) {
             throw new RequestException('Payment of ticket cannot be confirmed with bus line');
         }
         $confirmedTickets = $this->assignTicketNumberToTicketsInArray($requestConfirmPayment->getTicketsToConfirm(), $responseArray);
@@ -254,7 +261,7 @@ class Client
 
     protected function prepareTicketsToConfirm(array $tickets)
     {
-        foreach($tickets as $ticket) {
+        foreach ($tickets as $ticket) {
             $tickets_to_block[] = TicketToBlockFactory::create($ticket);
         }
 
@@ -307,6 +314,13 @@ class Client
         $options = array('trace' => 1, 'exception' => 1);
         $response = $this->soap_client->__soapCall($type, $params, array('trace' => $options));
 
+        $request = $this->soap_client->__getLastRequest();
+
+        $requestDateTime = new \DateTime();
+        $responseDateTime = new \DateTime();
+
+        $this->setCommunicationLog($request, $response, $requestDateTime, $responseDateTime);
+
         return $response;
     }
 
@@ -345,5 +359,21 @@ class Client
 
     public function setLog($logger) {
         $this->logger = $logger;
+    }
+
+    public function setCommunicationLog($request, $response, \DateTime $requestDateTime, \DateTime $responseDateTime)
+    {
+        $this->logEntry = new LogEntry();
+        $this->logEntry->setRequestBody($request);
+        $this->logEntry->setResponseBody($response);
+        $this->logEntry->setRequestDateTime($requestDateTime);
+        $this->logEntry->setResponseDateTime($responseDateTime);
+
+        return $this;
+    }
+
+    public function getCommunicationLog()
+    {
+        return $this->logEntry;
     }
 }
