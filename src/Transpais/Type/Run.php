@@ -317,5 +317,4 @@ class Run
     {
         return $this->categories;
     }
-
 }

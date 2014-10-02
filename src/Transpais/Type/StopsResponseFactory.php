@@ -13,12 +13,11 @@ use Transpais\Type\Errors\TypeException;
 
 class StopsResponseFactory
 {
-    static public function create($AllOrigins)
+    public static function create($AllOrigins)
     {
+        $paradaObj = $AllOrigins->out->Parada;
         if (!is_array($AllOrigins->out->Parada)) {
             $paradaObj[] = $AllOrigins->out->Parada;
-        } else {
-            $paradaObj = $AllOrigins->out->Parada;
         }
 
         foreach ($paradaObj as $origin) {
@@ -39,4 +38,4 @@ class StopsResponseFactory
 
         return $origins;
     }
-} 
+}

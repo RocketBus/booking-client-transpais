@@ -12,26 +12,22 @@ use Transpais\Type\Errors\TypeException;
 
 class SeatFactory
 {
-    static public function create($seatParams)
+    public static function create($seatParams)
     {
-        $seat = new Seat();
-
         if (!is_string($seatParams->asiento)) {
             throw new TypeException('Asiento should be a string');
-        } else {
-            $seat->setSeatNumber($seatParams->asiento);
         }
-
-        $seat->setColumn($seatParams->coluna);
-        $seat->setRow($seatParams->fila);
 
         if (!is_string($seatParams->status)) {
             throw new TypeException('Status should be a string');
-        } else {
-            $seat->setStatus($seatParams->status);
         }
+
+        $seat = new Seat();
+        $seat->setSeatNumber($seatParams->asiento);
+        $seat->setColumn($seatParams->coluna);
+        $seat->setRow($seatParams->fila);
+        $seat->setStatus($seatParams->status);
 
         return $seat;
     }
-
-} 
+}

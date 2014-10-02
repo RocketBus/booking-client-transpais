@@ -56,5 +56,4 @@ class ResponseSeatMap
     {
         $this->seat_types[] = $seat_type;
     }
-
 }

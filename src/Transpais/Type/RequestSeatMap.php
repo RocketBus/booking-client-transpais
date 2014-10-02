@@ -115,5 +115,4 @@ class RequestSeatMap
     {
         return $this->run_id;
     }
-
-} 
+}

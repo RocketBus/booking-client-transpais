@@ -117,10 +117,10 @@ class RequestBlockTicket
 
     public function appendTicket(Ticket $ticket)
     {
-        if (!$ticket instanceof Ticket ) {
+        if (!$ticket instanceof Ticket) {
             throw new \TypeException("An instance of Ticket is required");
         }
 
         $this->ticket = $ticket;
     }
-} 
+}

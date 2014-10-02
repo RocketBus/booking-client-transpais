@@ -12,4 +12,4 @@ namespace Transpais\Type\Errors;
 class SoapException extends \Exception
 {
 
-} 
+}

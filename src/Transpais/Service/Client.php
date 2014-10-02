@@ -25,11 +25,15 @@ use Transpais\Type\SeatFactory;
 
 class Client
 {
+    /**
+     * @var \SoapClient
+     */
     protected $soap_client;
     protected $usuario;
     protected $password;
     private $logger;
-
+    protected $lastRequest;
+    protected $lastResponse;
 
     /**
      * Initializing the SoapClient is needed on each call to this class
@@ -59,10 +63,11 @@ class Client
         );
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
-        if(!isset($soap_response->out->Corrida)) {
+        if (!isset($soap_response->out->Corrida)) {
             return new ResponseRuns();
         }
 
@@ -167,8 +172,9 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         if (is_null($soap_response->out->Boleto->boletoId)) {
             $error_msg = 'The seat you are tying to block is already taken, please select a '.
@@ -204,8 +210,9 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         $status = $soap_response->out->status;
         if ($status !== 'Eliminado') {
@@ -225,7 +232,7 @@ class Client
         $service_params = array(
             'in0' => $requestConfirmPayment->getClientId(), // client ID (corridaId)
             'in1' => $requestConfirmPayment->getUserId(), // user ID (usuarioId)
-            'in2' => $requestConfirmPayment->getCompanyId(), // company Id (empresaVoucherId - empresaId from corrida) objeto corrida
+            'in2' => $requestConfirmPayment->getCompanyId(), // company Id (empresaVoucherId - empresaId from corrida)
             'in3' => $requestConfirmPayment->getCard(), // card array (tarjeta)
             'in4' => $formattedTicketsToConfirm, // tickets array (boletos)
             'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
@@ -239,22 +246,26 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
-        if ($this->verifyTicketsWereConfirmed($responseArray) == false){
+        if ($this->verifyTicketsWereConfirmed($responseArray) == false) {
             throw new RequestException('Payment of ticket cannot be confirmed with bus line');
         }
-        $confirmedTickets = $this->assignTicketNumberToTicketsInArray($requestConfirmPayment->getTicketsToConfirm(), $responseArray);
+        $confirmedTickets = $this->assignTicketNumberToTicketsInArray(
+            $requestConfirmPayment->getTicketsToConfirm(),
+            $responseArray
+        );
 
         return $confirmedTickets;
     }
 
     protected function prepareTicketsToConfirm(array $tickets)
     {
-        foreach($tickets as $ticket) {
+        foreach ($tickets as $ticket) {
             $tickets_to_block[] = TicketToBlockFactory::create($ticket);
         }
 
@@ -279,15 +290,11 @@ class Client
 
     protected function findTicketBySeatNumber($haystack, $tickets)
     {
-
         foreach ($tickets as $ticket) {
             if ($ticket->numAsiento == $haystack) {
-                (object) $response = $ticket;
-                break;
+                return (object) $ticket;
             }
         }
-
-        return $response;
     }
 
     protected function verifyTicketsWereConfirmed($tickets)
@@ -295,7 +302,6 @@ class Client
         foreach ($tickets as $ticket) {
             if ($ticket->numOperacion === null || $ticket->numOperacion == -1) {
                 return false;
-
             }
         }
 
@@ -304,10 +310,23 @@ class Client
 
     protected function callSoapServiceByType($type, $params)
     {
-        $options = array('trace' => 1, 'exception' => 1);
-        $response = $this->soap_client->__soapCall($type, $params, array('trace' => $options));
+        $response = null;
+        try {
+            $options = array('trace' => 1, 'exception' => 1);
+            $response = $this->soap_client->__soapCall($type, $params, array('trace' => $options));
+            $this->createLogsCommunication();
+        } catch (\Exception $e) {
+            $this->createLogsCommunication();
+            throw new SoapException('Error webservice transpais: ' . $e->getMessage());
+        }
 
         return $response;
+    }
+
+    protected function createLogsCommunication()
+    {
+        $this->lastRequest = $this->soap_client->__getLastRequest();
+        $this->lastResponse = $this->soap_client->__getLastResponse();
     }
 
     public function setSoapClient($soapClient)
@@ -318,12 +337,10 @@ class Client
     protected function normalizePaymentConfirmationToArray($object)
     {
         if (!is_array($object)) {
-            $array[] = $object;
-        } else {
-            $array = $object;
+            return [$object];
         }
 
-        return $array;
+        return $object;
     }
 
     protected function normalizeResponseToRun($response)
@@ -343,7 +360,18 @@ class Client
         return $responseRuns;
     }
 
-    public function setLog($logger) {
+    public function setLog($logger)
+    {
         $this->logger = $logger;
+    }
+
+    public function getLastRequest()
+    {
+        return $this->lastRequest;
+    }
+
+    public function getLastResponse()
+    {
+        return $this->lastResponse;
     }
 }

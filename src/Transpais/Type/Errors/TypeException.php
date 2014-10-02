@@ -12,4 +12,4 @@ namespace Transpais\Type\Errors;
 class TypeException extends \Exception
 {
 
-} 
+}

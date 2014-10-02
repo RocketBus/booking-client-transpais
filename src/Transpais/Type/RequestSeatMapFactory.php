@@ -14,23 +14,20 @@ use Transpais\Type\Errors\TypeException;
 
 class RequestSeatMapFactory
 {
-    static public function create($params)
+    public static function create($params)
     {
-        $requestSeatMap = new RequestSeatMap();
-        $requestSeatMap->setOriginId($params['origin_id']);
-        $requestSeatMap->setDestinationId($params['destination_id']);
-
-        if ($params['date_of_run'] instanceof \DateTime) {
-            $requestSeatMap->setDateOfRun($params['date_of_run']);
-        } else {
+        if (! $params['date_of_run'] instanceof \DateTime) {
             throw new TypeException('Fecha de Corrida must be a Date Time');
         }
 
+        $requestSeatMap = new RequestSeatMap();
+        $requestSeatMap->setOriginId($params['origin_id']);
+        $requestSeatMap->setDestinationId($params['destination_id']);
+        $requestSeatMap->setDateOfRun($params['date_of_run']);
         $requestSeatMap->setPosId($params['pos_id']);
         $requestSeatMap->setRunId($params['run_id']);//Dynamic number, this is a mock number
         $requestSeatMap->setSaleTypeId($params['sale_type_id']);
 
         return $requestSeatMap;
     }
-
-} 
+}

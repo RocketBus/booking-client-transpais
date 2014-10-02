@@ -11,7 +11,7 @@ namespace Transpais\Type;
 
 class ResponseSeatMapFactory
 {
-    static public function create($soap_response)
+    public static function create($soap_response)
     {
         $responseSeatMap = new ResponseSeatMap();
 
@@ -46,5 +46,4 @@ class ResponseSeatMapFactory
 
         return $responseSeatMap;
     }
-
-} 
+}

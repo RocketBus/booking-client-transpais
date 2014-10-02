@@ -10,7 +10,6 @@ namespace Transpais\Type;
 
 use Transpais\Type\Errors\RequestException;
 
-
 class RequestRuns
 {
 

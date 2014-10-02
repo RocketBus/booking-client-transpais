@@ -113,6 +113,4 @@ class RequestConfirmPayment
     {
         return $this->user_id;
     }
-
-
-} 
+}

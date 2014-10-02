@@ -79,5 +79,4 @@ class Seat
     {
         return $this->seatNumber;
     }
-
 }
