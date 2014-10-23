@@ -60,12 +60,15 @@ class RunFactory
 
         $formattedFechaLlegada = null;
 
-        $gtm5 = new \DateTimeZone('GMT-5');
-        $gtm6 = new \DateTimeZone('GMT-6');
+        $gtm5 = new \DateTimeZone('Etc/GMT+5');
+        $gtm6 = new \DateTimeZone('Etc/GMT+6');
 
         if (intval(substr($corrida->fechorLlegada, -4, 1)) == 5) {
             $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada, $gtm5);
+            var_dump($formattedFechaLlegada);
             $formattedFechaLlegada->setTimezone($gtm6);
+            var_dump($formattedFechaLlegada);
+            die;
         } else {
             $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada);
         }
