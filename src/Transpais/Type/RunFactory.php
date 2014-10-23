@@ -59,8 +59,9 @@ class RunFactory
         }
 
         $formattedFechaLlegada = null;
-        $gtm5 = new \DateTimeZone("-05:00");
-        $gtm6 = new \DateTimeZone('-06:00');
+
+        $gtm5 = new \DateTimeZone('GMT-5');
+        $gtm6 = new \DateTimeZone('GMT-6');
 
         if (intval(substr($corrida->fechorLlegada, -4, 1)) == 5) {
             $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada, $gtm5);
