@@ -9,6 +9,7 @@
 namespace Transpais\Service;
 
 use SebastianBergmann\Exporter\Exception;
+use Transpais\Exception\TimeoutException;
 use Transpais\Type\Errors\SoapException;
 use Transpais\Type\RequestBlockTicket;
 use Transpais\Type\RequestConfirmPayment;
@@ -30,6 +31,8 @@ class Client
     protected $password;
     private $logger;
 
+    const MAX_SOCKET_TIME = 15;
+
 
     /**
      * Initializing the SoapClient is needed on each call to this class
@@ -39,6 +42,10 @@ class Client
         $this->setSoapClient($soapClient);
         $this->usuario = $config['usuario'];
         $this->password = $config['password'];
+
+        $this->maxSocketTimeout = (isset($config['max_socket_timeout'])) ?
+            $config['max_socket_timeout'] :
+            self::MAX_SOCKET_TIME;
     }
 
     public function getRunsInADay(RequestRuns $requestRuns)
@@ -57,7 +64,18 @@ class Client
         $soap_param = array(
             'ventaService' => $service_params
         );
-        $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+
+        $configMaxSocketTimeout = ini_get('default_socket_timeout');
+        try {
+            ini_set('default_socket_timeout', $this->maxSocketTimeout);
+            $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
+            ini_set('default_socket_timeout', $configMaxSocketTimeout);
+
+        } catch (\Exception $e) {
+            ini_set('default_socket_timeout', $configMaxSocketTimeout);
+            throw new TimeoutException('There was no response from the Booking Engine');
+
+        }
 
         if(isset($this->logger))
             $this->logger->addNotice(print_r($soap_response,true));
