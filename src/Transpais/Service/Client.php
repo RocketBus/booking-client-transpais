@@ -1,13 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/3/14
- * Time: 10:23 AM
- */
-
 namespace Transpais\Service;
 
+use Rocket\Bus\Mexico\SharedBundle\BookingEngines\Exceptions\UnavailableSeatException;
 use SebastianBergmann\Exporter\Exception;
 use Transpais\Type\Errors\SoapException;
 use Transpais\Type\RequestBlockTicket;
@@ -29,7 +23,6 @@ class Client
     protected $usuario;
     protected $password;
     private $logger;
-
 
     /**
      * Initializing the SoapClient is needed on each call to this class
@@ -167,13 +160,8 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
-
         if (is_null($soap_response->out->Boleto->boletoId)) {
-            $error_msg = 'The seat you are tying to block is already taken, please select a '.
-                'different one or unblock this seat first.';
-            throw new RequestException($error_msg);
+            throw new UnavailableSeatException($this->exceptionErrorMessage(print_r($soap_response, true)));
         }
 
         $Boleto = $soap_response->out->Boleto;
@@ -345,5 +333,16 @@ class Client
 
     public function setLog($logger) {
         $this->logger = $logger;
+    }
+
+    /**
+     * Returns a message describing the error response from the booking engine
+     *
+     * @param $message
+     * @return string
+     */
+    public function exceptionErrorMessage($message)
+    {
+        return '[SEAT RESERVATION ERROR(Booking Engine: Transpais)] : '. $message;
     }
 }
