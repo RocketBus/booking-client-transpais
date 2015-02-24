@@ -1,19 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/17/14
- * Time: 12:01 PM
- */
 
 namespace Transpais\Type;
 
-
 use Transpais\Type\Errors\TypeException;
 
+/**
+ * Class TicketFactory
+ * @package Transpais\Type
+ */
 class TicketFactory
 {
-    static public function create($params)
+    public static function create($params)
     {
 
         $ticket_to_block = new Ticket();
@@ -73,4 +70,4 @@ class TicketFactory
 
         return $ticket_to_block;
     }
-} 
+}

@@ -1,14 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/3/14
- * Time: 11:38 AM
- */
-
 namespace Transpais\Type;
 
-
+/**
+ * Class Run
+ * @package Transpais\Type
+ */
 class Run
 {
     protected $idleSeatsNum;
@@ -317,5 +313,4 @@ class Run
     {
         return $this->categories;
     }
-
 }

@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/16/14
- * Time: 11:09 AM
- */
 
 namespace Transpais\Type;
-
 
 class RequestConfirmPayment
 {
@@ -113,6 +106,4 @@ class RequestConfirmPayment
     {
         return $this->user_id;
     }
-
-
-} 
+}

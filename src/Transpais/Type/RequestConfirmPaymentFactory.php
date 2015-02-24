@@ -1,19 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/16/14
- * Time: 11:22 AM
- */
-
 namespace Transpais\Type;
-
 
 use Transpais\Type\Errors\TypeException;
 
+/**
+ * Class RequestConfirmPaymentFactory
+ * @package Transpais\Type
+ */
 class RequestConfirmPaymentFactory
 {
-    static public function create($params)
+    public static function create($params)
     {
         $requestConfirmPayment = new RequestConfirmPayment();
 

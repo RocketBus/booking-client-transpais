@@ -1,16 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/3/14
- * Time: 3:32 PM
- */
-
 namespace Transpais\Type;
 
 use Transpais\Type\Errors\RequestException;
 use Transpais\Type\RequestRuns;
 
+/**
+ * Class RequestSeatMap
+ * @package Transpais\Type
+ */
 class RequestSeatMap
 {
     protected $origin_id;
@@ -115,5 +112,4 @@ class RequestSeatMap
     {
         return $this->run_id;
     }
-
-} 
+}

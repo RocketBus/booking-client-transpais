@@ -1,17 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/25/14
- * Time: 3:38 PM
- */
-
 namespace Transpais\Type;
 
-
+/**
+ * Class ResponseSeatMapFactory
+ * @package Transpais\Type
+ */
 class ResponseSeatMapFactory
 {
-    static public function create($soap_response)
+    public static function create($soap_response)
     {
         $responseSeatMap = new ResponseSeatMap();
 
@@ -46,5 +42,4 @@ class ResponseSeatMapFactory
 
         return $responseSeatMap;
     }
-
-} 
+}
