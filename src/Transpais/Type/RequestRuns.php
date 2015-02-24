@@ -1,16 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/3/14
- * Time: 10:04 AM
- */
 
 namespace Transpais\Type;
 
 use Transpais\Type\Errors\RequestException;
 
-
+/**
+ * Class RequestRuns
+ * @package Transpais\Type
+ */
 class RequestRuns
 {
 

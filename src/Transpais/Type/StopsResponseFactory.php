@@ -1,19 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/22/14
- * Time: 12:23 PM
- */
-
 namespace Transpais\Type;
-
 
 use Transpais\Type\Errors\TypeException;
 
+/**
+ * Class StopsResponseFactory
+ * @package Transpais\Type
+ */
 class StopsResponseFactory
 {
-    static public function create($AllOrigins)
+    public static function create($AllOrigins)
     {
         if (!is_array($AllOrigins->out->Parada)) {
             $paradaObj[] = $AllOrigins->out->Parada;
@@ -22,7 +18,6 @@ class StopsResponseFactory
         }
 
         foreach ($paradaObj as $origin) {
-
             if (!is_int($origin->id)) {
                 throw new TypeException('Parada Id must be a numeric value');
             }
@@ -39,4 +34,4 @@ class StopsResponseFactory
 
         return $origins;
     }
-} 
+}

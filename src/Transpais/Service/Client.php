@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/3/14
- * Time: 10:23 AM
- */
-
 namespace Transpais\Service;
 
 use SebastianBergmann\Exporter\Exception;
@@ -24,6 +17,10 @@ use Transpais\Type\RunFactory;
 use Transpais\Type\Errors\RequestException;
 use Transpais\Type\SeatFactory;
 
+/**
+ * Class Client
+ * @package Transpais\Service
+ */
 class Client
 {
     protected $soap_client;
@@ -77,10 +74,11 @@ class Client
 
         }
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
-        if(!isset($soap_response->out->Corrida)) {
+        if (!isset($soap_response->out->Corrida)) {
             return new ResponseRuns();
         }
 
@@ -185,8 +183,9 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         if (is_null($soap_response->out->Boleto->boletoId)) {
             $error_msg = 'The seat you are tying to block is already taken, please select a '.
@@ -222,8 +221,9 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         $status = $soap_response->out->status;
         if ($status !== 'Eliminado') {
@@ -241,12 +241,12 @@ class Client
         $formattedTicketsToConfirm = $this->prepareTicketsToConfirm($tickets_to_confirm);
 
         $service_params = array(
-            'in0' => $requestConfirmPayment->getClientId(), // client ID (corridaId)
-            'in1' => $requestConfirmPayment->getUserId(), // user ID (usuarioId)
-            'in2' => $requestConfirmPayment->getCompanyId(), // company Id (empresaVoucherId - empresaId from corrida) objeto corrida
-            'in3' => $requestConfirmPayment->getCard(), // card array (tarjeta)
-            'in4' => $formattedTicketsToConfirm, // tickets array (boletos)
-            'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
+            'in0' => $requestConfirmPayment->getClientId(),
+            'in1' => $requestConfirmPayment->getUserId(),
+            'in2' => $requestConfirmPayment->getCompanyId(),
+            'in3' => $requestConfirmPayment->getCard(),
+            'in4' => $formattedTicketsToConfirm,
+            'in5' => $requestConfirmPayment->getIsReturnTicket(),
             'in6' => $this->usuario,
             'in7' => $this->password
         );
@@ -257,22 +257,26 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
-        if ($this->verifyTicketsWereConfirmed($responseArray) == false){
+        if ($this->verifyTicketsWereConfirmed($responseArray) == false) {
             throw new RequestException('Payment of ticket cannot be confirmed with bus line');
         }
-        $confirmedTickets = $this->assignTicketNumberToTicketsInArray($requestConfirmPayment->getTicketsToConfirm(), $responseArray);
+        $confirmedTickets = $this->assignTicketNumberToTicketsInArray(
+            $requestConfirmPayment->getTicketsToConfirm(),
+            $responseArray
+        );
 
         return $confirmedTickets;
     }
 
     protected function prepareTicketsToConfirm(array $tickets)
     {
-        foreach($tickets as $ticket) {
+        foreach ($tickets as $ticket) {
             $tickets_to_block[] = TicketToBlockFactory::create($ticket);
         }
 
@@ -361,7 +365,8 @@ class Client
         return $responseRuns;
     }
 
-    public function setLog($logger) {
+    public function setLog($logger)
+    {
         $this->logger = $logger;
     }
 }

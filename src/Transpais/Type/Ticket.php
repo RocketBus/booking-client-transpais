@@ -1,14 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/7/14
- * Time: 12:21 PM
- */
 
 namespace Transpais\Type;
 
-
+/**
+ * Class Ticket
+ * @package Transpais\Type
+ */
 class Ticket
 {
     protected $ticket_id;

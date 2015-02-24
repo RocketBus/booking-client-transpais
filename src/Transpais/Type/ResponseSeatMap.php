@@ -1,15 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/4/14
- * Time: 5:37 PM
- */
-
 namespace Transpais\Type;
 
 use Transpais\Type\Errors\TypeException;
 
+/**
+ * Class ResponseSeatMap
+ * @package Transpais\Type
+ */
 class ResponseSeatMap
 {
     protected $seats;
@@ -56,5 +53,4 @@ class ResponseSeatMap
     {
         $this->seat_types[] = $seat_type;
     }
-
 }

@@ -1,13 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/7/14
- * Time: 10:51 AM
- */
-
 namespace Transpais\Type;
 
+/**
+ * Class RequestBlockTicket
+ * @package Transpais\Type
+ */
 class RequestBlockTicket
 {
     protected $client_id; //clienteId
@@ -114,13 +111,12 @@ class RequestBlockTicket
     } //boletos
 
 
-
     public function appendTicket(Ticket $ticket)
     {
-        if (!$ticket instanceof Ticket ) {
+        if (!$ticket instanceof Ticket) {
             throw new \TypeException("An instance of Ticket is required");
         }
 
         $this->ticket = $ticket;
     }
-} 
+}

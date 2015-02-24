@@ -1,10 +1,12 @@
 <?php
-
-
 namespace Transpais\Type;
 
-
-class Category {
+/**
+ * Class Category
+ * @package Transpais\Type
+ */
+class Category
+{
 
     /**
      * @var string
@@ -89,7 +91,4 @@ class Category {
     {
         return $this->value;
     }
-
-
-
-} 
+}
