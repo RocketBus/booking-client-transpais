@@ -1,18 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/14/14
- * Time: 12:35 PM
- */
-
 namespace Transpais\Type;
 
 use Transpais\Type\Errors\TypeException;
 
+/**
+ * Class SeatFactory
+ * @package Transpais\Type
+ */
 class SeatFactory
 {
-    static public function create($seatParams)
+    public static function create($seatParams)
     {
         $seat = new Seat();
 
@@ -33,5 +30,4 @@ class SeatFactory
 
         return $seat;
     }
-
-} 
+}

@@ -1,14 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/3/14
- * Time: 11:38 AM
- */
-
 namespace Transpais\Type;
 
-
+/**
+ * Class Seat
+ * @package Transpais\Type
+ */
 class Seat
 {
     protected $seatNumber;
@@ -79,5 +75,4 @@ class Seat
     {
         return $this->seatNumber;
     }
-
 }

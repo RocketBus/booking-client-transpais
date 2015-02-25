@@ -1,20 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: degaray
- * Date: 7/18/14
- * Time: 4:54 PM
- */
-
 namespace Transpais\Type;
-
 
 use SebastianBergmann\Exporter\Exception;
 use Transpais\Type\Errors\TypeException;
 
+/**
+ * Class RequestSeatMapFactory
+ * @package Transpais\Type
+ */
 class RequestSeatMapFactory
 {
-    static public function create($params)
+    public static function create($params)
     {
         $requestSeatMap = new RequestSeatMap();
         $requestSeatMap->setOriginId($params['origin_id']);
@@ -32,5 +28,4 @@ class RequestSeatMapFactory
 
         return $requestSeatMap;
     }
-
-} 
+}
