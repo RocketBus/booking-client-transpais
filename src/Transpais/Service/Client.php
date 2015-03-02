@@ -281,6 +281,11 @@ class Client
         return $tickets_to_block;
     }
 
+    /**
+     * @param $ticketsToConfirm
+     * @param $responseTickets
+     * @return array
+     */
     protected function assignTicketNumberToTicketsInArray($ticketsToConfirm, $responseTickets)
     {
         foreach ($ticketsToConfirm as $ticketToConfirm) {
@@ -289,7 +294,7 @@ class Client
             $ticketToConfirm->setTicketId($confirmedTicket->boletoId);
             $ticketToConfirm->setTransactionNum($confirmedTicket->numOperacion);
             $ticketToConfirm->setFolioNumber($confirmedTicket->numFolioSistema);
-
+            $ticketToConfirm->setIKey($confirmedTicket->iKey);
 
             $confirmedTickets[] = $ticketToConfirm;
         }

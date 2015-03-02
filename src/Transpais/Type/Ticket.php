@@ -20,6 +20,13 @@ class Ticket
     protected $passenger_name; //nombrePasajero
     protected $seat_number;
     protected $folio_number; //numFolioSistema
+
+    /**
+     * Invoice number (Folio para Facturación)
+     * @var
+     */
+    protected $iKey;
+
     protected $transaction_num; //numOperacion
     protected $base_price;
     protected $price;
@@ -350,5 +357,21 @@ class Ticket
     public function getTransactionNum()
     {
         return $this->transaction_num;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIKey()
+    {
+        return $this->iKey;
+    }
+
+    /**
+     * @param mixed $iKey
+     */
+    public function setIKey($iKey)
+    {
+        $this->iKey = $iKey;
     }
 }
