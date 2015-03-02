@@ -14,15 +14,17 @@ use Transpais\Type\RequestBlockTicket;
 use Transpais\Type\RequestConfirmPayment;
 use Transpais\Type\RequestRuns;
 use Transpais\Type\RequestSeatMap;
-use Transpais\Type\ResponseSeatMap;
 use Transpais\Type\ResponseRuns;
 use Transpais\Type\ResponseSeatMapFactory;
 use Transpais\Type\StopsResponseFactory;
 use Transpais\Type\TicketToBlockFactory;
 use Transpais\Type\RunFactory;
 use Transpais\Type\Errors\RequestException;
-use Transpais\Type\SeatFactory;
 
+/**
+ * Class Client
+ * @package Transpais\Service
+ */
 class Client
 {
     protected $soap_client;
@@ -59,10 +61,11 @@ class Client
         );
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
-        if(!isset($soap_response->out->Corrida)) {
+        if (!isset($soap_response->out->Corrida)) {
             return new ResponseRuns();
         }
 
@@ -145,6 +148,12 @@ class Client
         return $response;
     }
 
+    /**
+     * When a seat is selected we have to create a ticket and block it.
+     * @param RequestBlockTicket $RequestBlockTicket
+     * @return mixed
+     * @throws RequestException
+     */
     public function blockTicket(RequestBlockTicket $RequestBlockTicket)
     {
         $service_type = 'bloquearAsientos';
@@ -167,8 +176,9 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         if (is_null($soap_response->out->Boleto->boletoId)) {
             $error_msg = 'The seat you are tying to block is already taken, please select a '.
@@ -187,7 +197,6 @@ class Client
 
     public function unblockTicket($ticket_id, $user_id)
     {
-
         $service_type = 'desbloquearAsientos';
 
         $service_params = array(
@@ -204,8 +213,9 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         $status = $soap_response->out->status;
         if ($status !== 'Eliminado') {
@@ -215,6 +225,12 @@ class Client
         return true;
     }
 
+    /**
+     * Called in the checkout with you press "Confirmar" button.
+     * @param RequestConfirmPayment $requestConfirmPayment
+     * @return array
+     * @throws RequestException
+     */
     public function confirmPayment(RequestConfirmPayment $requestConfirmPayment)
     {
         $service_type = 'confirmarVentaTarjeta';
@@ -225,7 +241,8 @@ class Client
         $service_params = array(
             'in0' => $requestConfirmPayment->getClientId(), // client ID (corridaId)
             'in1' => $requestConfirmPayment->getUserId(), // user ID (usuarioId)
-            'in2' => $requestConfirmPayment->getCompanyId(), // company Id (empresaVoucherId - empresaId from corrida) objeto corrida
+            //  (empresaVoucherId - empresaId from corrida) objeto corrida
+            'in2' => $requestConfirmPayment->getCompanyId(),
             'in3' => $requestConfirmPayment->getCard(), // card array (tarjeta)
             'in4' => $formattedTicketsToConfirm, // tickets array (boletos)
             'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
@@ -239,22 +256,25 @@ class Client
 
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
-        if(isset($this->logger))
-            $this->logger->addNotice(print_r($soap_response,true));
+        if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($soap_response, true));
+        }
 
         $responseArray = $this->normalizePaymentConfirmationToArray($soap_response->out->Boleto);
 
-        if ($this->verifyTicketsWereConfirmed($responseArray) == false){
+        if ($this->verifyTicketsWereConfirmed($responseArray) == false) {
             throw new RequestException('Payment of ticket cannot be confirmed with bus line');
         }
-        $confirmedTickets = $this->assignTicketNumberToTicketsInArray($requestConfirmPayment->getTicketsToConfirm(), $responseArray);
+
+        $ticketsToConfirm = $requestConfirmPayment->getTicketsToConfirm();
+        $confirmedTickets = $this->assignTicketNumberToTicketsInArray($ticketsToConfirm, $responseArray);
 
         return $confirmedTickets;
     }
 
     protected function prepareTicketsToConfirm(array $tickets)
     {
-        foreach($tickets as $ticket) {
+        foreach ($tickets as $ticket) {
             $tickets_to_block[] = TicketToBlockFactory::create($ticket);
         }
 
@@ -279,7 +299,6 @@ class Client
 
     protected function findTicketBySeatNumber($haystack, $tickets)
     {
-
         foreach ($tickets as $ticket) {
             if ($ticket->numAsiento == $haystack) {
                 (object) $response = $ticket;
@@ -343,7 +362,8 @@ class Client
         return $responseRuns;
     }
 
-    public function setLog($logger) {
+    public function setLog($logger)
+    {
         $this->logger = $logger;
     }
 }
