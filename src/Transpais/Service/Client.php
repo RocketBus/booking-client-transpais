@@ -213,12 +213,12 @@ class Client
         $formattedTicketsToConfirm = $this->prepareTicketsToConfirm($tickets_to_confirm);
 
         $service_params = array(
-            'in0' => $requestConfirmPayment->getClientId(), // client ID (corridaId)
-            'in1' => $requestConfirmPayment->getUserId(), // user ID (usuarioId)
-            'in2' => $requestConfirmPayment->getCompanyId(), // company Id (empresaVoucherId - empresaId from corrida) objeto corrida
-            'in3' => $requestConfirmPayment->getCard(), // card array (tarjeta)
-            'in4' => $formattedTicketsToConfirm, // tickets array (boletos)
-            'in5' => $requestConfirmPayment->getIsReturnTicket(), // is a return ticket BOOL (esRedondo)
+            'in0' => $requestConfirmPayment->getClientId(),
+            'in1' => $requestConfirmPayment->getUserId(),
+            'in2' => $requestConfirmPayment->getCompanyId(),
+            'in3' => $requestConfirmPayment->getCard(),
+            'in4' => $formattedTicketsToConfirm,
+            'in5' => $requestConfirmPayment->getIsReturnTicket(),
             'in6' => $this->usuario,
             'in7' => $this->password
         );
