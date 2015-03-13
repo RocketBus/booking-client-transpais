@@ -326,7 +326,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
                     'numOperacion' => '-1',
                     'numFolioSistema' =>'4567',
                     'origenId' => 1886,
-                    'precio' => '315'
+                    'precio' => '315',
+                    'iKey' => '1234'
                 )
             )
         );

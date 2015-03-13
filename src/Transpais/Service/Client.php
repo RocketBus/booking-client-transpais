@@ -8,14 +8,12 @@ use Transpais\Type\RequestBlockTicket;
 use Transpais\Type\RequestConfirmPayment;
 use Transpais\Type\RequestRuns;
 use Transpais\Type\RequestSeatMap;
-use Transpais\Type\ResponseSeatMap;
 use Transpais\Type\ResponseRuns;
 use Transpais\Type\ResponseSeatMapFactory;
 use Transpais\Type\StopsResponseFactory;
 use Transpais\Type\TicketToBlockFactory;
 use Transpais\Type\RunFactory;
 use Transpais\Type\Errors\RequestException;
-use Transpais\Type\SeatFactory;
 
 /**
  * Class Client
@@ -161,6 +159,12 @@ class Client
         return $response;
     }
 
+    /**
+     * When a seat is selected we have to create a ticket and block it.
+     * @param RequestBlockTicket $RequestBlockTicket
+     * @return mixed
+     * @throws RequestException
+     */
     public function blockTicket(RequestBlockTicket $RequestBlockTicket)
     {
         $service_type = 'bloquearAsientos';
@@ -204,7 +208,6 @@ class Client
 
     public function unblockTicket($ticket_id, $user_id)
     {
-
         $service_type = 'desbloquearAsientos';
 
         $service_params = array(
@@ -233,6 +236,12 @@ class Client
         return true;
     }
 
+    /**
+     * Called in the checkout with you press "Confirmar" button.
+     * @param RequestConfirmPayment $requestConfirmPayment
+     * @return array
+     * @throws RequestException
+     */
     public function confirmPayment(RequestConfirmPayment $requestConfirmPayment)
     {
         $service_type = 'confirmarVentaTarjeta';
@@ -248,7 +257,7 @@ class Client
             'in4' => $formattedTicketsToConfirm,
             'in5' => $requestConfirmPayment->getIsReturnTicket(),
             'in6' => $this->usuario,
-            'in7' => $this->password
+            'in7' => $this->password,
         );
 
         $soap_param = array(
@@ -266,10 +275,9 @@ class Client
         if ($this->verifyTicketsWereConfirmed($responseArray) == false) {
             throw new RequestException('Payment of ticket cannot be confirmed with bus line');
         }
-        $confirmedTickets = $this->assignTicketNumberToTicketsInArray(
-            $requestConfirmPayment->getTicketsToConfirm(),
-            $responseArray
-        );
+
+        $ticketsToConfirm = $requestConfirmPayment->getTicketsToConfirm();
+        $confirmedTickets = $this->assignTicketNumberToTicketsInArray($ticketsToConfirm, $responseArray);
 
         return $confirmedTickets;
     }
@@ -283,6 +291,11 @@ class Client
         return $tickets_to_block;
     }
 
+    /**
+     * @param $ticketsToConfirm
+     * @param $responseTickets
+     * @return array
+     */
     protected function assignTicketNumberToTicketsInArray($ticketsToConfirm, $responseTickets)
     {
         foreach ($ticketsToConfirm as $ticketToConfirm) {
@@ -291,7 +304,7 @@ class Client
             $ticketToConfirm->setTicketId($confirmedTicket->boletoId);
             $ticketToConfirm->setTransactionNum($confirmedTicket->numOperacion);
             $ticketToConfirm->setFolioNumber($confirmedTicket->numFolioSistema);
-
+            $ticketToConfirm->setIKey($confirmedTicket->iKey);
 
             $confirmedTickets[] = $ticketToConfirm;
         }
@@ -301,7 +314,6 @@ class Client
 
     protected function findTicketBySeatNumber($haystack, $tickets)
     {
-
         foreach ($tickets as $ticket) {
             if ($ticket->numAsiento == $haystack) {
                 (object) $response = $ticket;
