@@ -62,7 +62,7 @@ class RunFactory
 
         if (intval(substr($corrida->fechorLlegada, -4, 1)) == 5) {
             $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada, $gtm5);
-            $formattedFechaLlegada->setTimezone($gtm5);
+            $formattedFechaLlegada->setTimezone($gtm6);
         } else {
              $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada);
         }
@@ -77,7 +77,7 @@ class RunFactory
 
         if (intval(substr($corrida->fechorLlegada, -4, 1)) == 5) {
             $formattedFechorSalida = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorSalida, $gtm5);
-            $formattedFechorSalida->setTimezone($gtm5);
+            $formattedFechorSalida->setTimezone($gtm6);
         } else {
             $formattedFechorSalida = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorSalida);
         }
