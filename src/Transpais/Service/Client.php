@@ -192,9 +192,7 @@ class Client
         }
 
         if (is_null($soap_response->out->Boleto->boletoId)) {
-            $error_msg = 'The seat you are tying to block is already taken, please select a '.
-                'different one or unblock this seat first.';
-            throw new RequestException($error_msg);
+            return false;
         }
 
         $Boleto = $soap_response->out->Boleto;
