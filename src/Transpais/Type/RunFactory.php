@@ -55,14 +55,33 @@ class RunFactory
             $run->setDateOfRun($formattedFechaCorrida);
         }
 
-        $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada);
+
+        $formattedFechaLlegada = null;
+        $gtm5 = new \DateTimeZone("-05:00");
+        $gtm6 = new \DateTimeZone('-06:00');
+
+        if (intval(substr($corrida->fechorLlegada, -4, 1)) == 5) {
+            $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada, $gtm5);
+            $formattedFechaLlegada->setTimezone($gtm5);
+        } else {
+             $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada);
+         }
         if ($formattedFechaLlegada == false) {
             throw new TypeException('Fecha Hora LLegada should be a string with date format');
         } else {
             $run->setDateOfArrival($formattedFechaLlegada);
         }
 
-        $formattedFechorSalida = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorSalida);
+
+        $formattedFechorSalida = null;
+
+        if (intval(substr($corrida->fechorLlegada, -4, 1)) == 5) {
+            $formattedFechorSalida = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorSalida, $gtm5);
+            $formattedFechorSalida->setTimezone($gtm5);
+        } else {
+            $formattedFechorSalida = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorSalida);
+        }
+
         if ($formattedFechorSalida == false) {
             throw new TypeException('Fecha Hora Salida should be a string with date format');
         } else {
