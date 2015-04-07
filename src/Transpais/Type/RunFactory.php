@@ -65,7 +65,7 @@ class RunFactory
             $formattedFechaLlegada->setTimezone($gtm5);
         } else {
              $formattedFechaLlegada = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $corrida->fechorLlegada);
-         }
+        }
         if ($formattedFechaLlegada == false) {
             throw new TypeException('Fecha Hora LLegada should be a string with date format');
         } else {
