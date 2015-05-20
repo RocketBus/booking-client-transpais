@@ -27,6 +27,7 @@ class Client
     private $logger;
 
     const MAX_SOCKET_TIME = 15;
+    const SECOND_FLOOR = 2;
 
 
     /**
@@ -367,7 +368,7 @@ class Client
 
         if (is_array($response)) {
             foreach ($response as $run) {
-                if ($run->numPiso == 2) {
+                if ($run->numPiso == self::SECOND_FLOOR) {
                     continue;
                 }
                 $runObj = RunFactory::create($run);
