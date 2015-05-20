@@ -81,7 +81,6 @@ class Client
         }
 
         $corrida = $soap_response->out->Corrida;
-
         $response = $this->normalizeResponseToRun($corrida);
 
         return $response;
@@ -188,6 +187,7 @@ class Client
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
         if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($service_params, true));
             $this->logger->addNotice(print_r($soap_response, true));
         }
 
@@ -267,6 +267,7 @@ class Client
         $soap_response = $this->callSoapServiceByType($service_type, $soap_param);
 
         if (isset($this->logger)) {
+            $this->logger->addNotice(print_r($service_params, true));
             $this->logger->addNotice(print_r($soap_response, true));
         }
 
@@ -366,6 +367,9 @@ class Client
 
         if (is_array($response)) {
             foreach ($response as $run) {
+                if ($run->numPiso == 2) {
+                    continue;
+                }
                 $runObj = RunFactory::create($run);
                 $responseRuns->append($runObj);
             }
