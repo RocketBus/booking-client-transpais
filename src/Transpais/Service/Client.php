@@ -368,9 +368,6 @@ class Client
 
         if (is_array($response)) {
             foreach ($response as $run) {
-                if ($run->numPiso == self::SECOND_FLOOR) {
-                    continue;
-                }
                 $runObj = RunFactory::create($run);
                 $responseRuns->append($runObj);
             }
