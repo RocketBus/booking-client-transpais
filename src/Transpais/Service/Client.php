@@ -307,6 +307,7 @@ class Client
             $ticketToConfirm->setTransactionNum($confirmedTicket->numOperacion);
             $ticketToConfirm->setFolioNumber($confirmedTicket->numFolioSistema);
             $ticketToConfirm->setIKey($confirmedTicket->iKey);
+            $ticketToConfirm->setRunId($confirmedTicket->corridaId);
 
             $confirmedTickets[] = $ticketToConfirm;
         }
