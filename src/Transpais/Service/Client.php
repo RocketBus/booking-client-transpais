@@ -138,7 +138,7 @@ class Client
 
         $formattedDateOfRun = $requestSeatMap->getDateOfRun()->format('c');
         $service_params = array(
-            'in0' => $requestSeatMap->getRunId(), // run ID (corridaId)
+            'in0' => (int)$requestSeatMap->getRunId(), // run ID (corridaId)
             'in1' => $formattedDateOfRun,
             'in2' => $requestSeatMap->getOriginId(),
             'in3' => $requestSeatMap->getDestinationId(), // destination Place ID (destinoId)
