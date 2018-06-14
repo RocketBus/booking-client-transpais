@@ -29,7 +29,7 @@ class TicketFactory
             throw new TypeException('Categoria Id must be a numeric value');
         }
 
-        if (in_numeric($params['run_id'])) {
+        if (is_numeric($params['run_id'])) {
             $ticket_to_block->setRunId($params['run_id']);
         } else {
             throw new TypeException('Corrida Id must be a numeric value');
