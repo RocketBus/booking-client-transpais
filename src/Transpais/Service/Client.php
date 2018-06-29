@@ -336,11 +336,17 @@ class Client
      */
     protected function callSoapServiceByType($type, $params)
     {
-        $options = array('trace' => 1, 'exception' => 1);
-
         $this->logger->info("[transpais][request][$type]" . json_encode($params));
         try {
-            $response = $this->soap_client->__soapCall($type, $params, array('trace' => $options));
+            $response = $this->soap_client->__soapCall(
+                $type,
+                $params,
+                [
+                    'trace' => 1,
+                    'exceptions' => true,
+                    'cache_wsdl' => WSDL_CACHE_MEMORY
+                ]
+            );
             $this->logger->info("[transpais][response][$type]" . json_encode($response));
         } catch (\Exception $exception) {
             $this->logger->error("[transpais][response][$type]" . $exception->getMessage());
