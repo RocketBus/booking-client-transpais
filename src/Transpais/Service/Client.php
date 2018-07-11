@@ -23,9 +23,30 @@ use Transpais\Type\Errors\RequestException;
  */
 class Client
 {
+    /**
+     * @var \SoapClient $soap_client
+     */
     protected $soap_client;
+
+    /**
+     * @var $usuario
+     */
     protected $usuario;
+
+    /**
+     * @var $password
+     */
     protected $password;
+
+    /**
+     * @var array()
+     */
+    protected $lastRequest;
+
+    /**
+     * @var array()
+     */
+    protected $lastResponse;
 
     /**
      * @var LoggerInterface
@@ -39,7 +60,7 @@ class Client
     /**
      * Initializing the SoapClient is needed on each call to this class
      */
-    public function __construct($soapClient, $config)
+    public function __construct(\SoapClient $soapClient, $config)
     {
         $this->setSoapClient($soapClient);
         $this->usuario = $config['usuario'];
@@ -336,17 +357,11 @@ class Client
      */
     protected function callSoapServiceByType($type, $params)
     {
+        $options = array('trace' => 1, 'exceptions' => 1, 'cache_wsdl' => WSDL_CACHE_BOTH);
+
         $this->logger->info("[transpais][request][$type]" . json_encode($params));
         try {
-            $response = $this->soap_client->__soapCall(
-                $type,
-                $params,
-                [
-                    'trace' => 1,
-                    'exceptions' => true,
-                    'cache_wsdl' => WSDL_CACHE_MEMORY
-                ]
-            );
+            $response = $this->soap_client->__soapCall($type, $params, $options);
             $this->logger->info("[transpais][response][$type]" . json_encode($response));
         } catch (\Exception $exception) {
             $this->logger->error("[transpais][response][$type]" . $exception->getMessage());
@@ -356,7 +371,10 @@ class Client
         return $response;
     }
 
-    public function setSoapClient($soapClient)
+    /**
+     * @param \SoapClient $soapClient
+     */
+    public function setSoapClient(\SoapClient $soapClient)
     {
         $this->soap_client = $soapClient;
     }
@@ -396,4 +414,38 @@ class Client
     {
         $this->logger = $logger;
     }
+
+    /**
+     * @param array $lastResponse
+     */
+    public function setLastResponse()
+    {
+        $this->lastRequest = $this->soap_client->__getLastResponse();
+
+    }
+
+    /**
+     * @return array
+     */
+    public function getLastResponse()
+    {
+        return [$this->soap_client->__getLastResponse()];
+    }
+
+    /**
+     * @param array $lastRequest
+     */
+    public function setLastRequest()
+    {
+        $this->lastRequest = $this->soap_client->__getLastRequest();
+    }
+
+    /**
+     * @return array()
+     */
+    public function getLastRequest()
+    {
+        return [$this->soap_client->__getLastRequest()];
+    }
+
 }
